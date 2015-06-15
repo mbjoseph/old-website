@@ -4,7 +4,7 @@ email: maxwell.b.joseph@colorado.edu
 description: ""
 
 baseurl: "" # the subpath of your site, e.g. /blog/
-url: "mbjoseph.github.io" # the base hostname & protocol for your site
+url: "http://mbjoseph.github.io" # the base hostname & protocol for your site
 twitter_username: mxwlj
 github_username:  mbjoseph
 
