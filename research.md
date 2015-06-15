@@ -27,21 +27,21 @@ Amphibians face many threats worldwide, even in protected wilderness areas and n
 
 ### Peer-reviewed publications
 
-- Mihaljevic JR, Joseph MB, Johnson PTJ. In press. Using multi-species occupancy models to improve the characterization and understanding of metacommunity structure. Ecology. preprint
+- Mihaljevic JR, Joseph MB, Johnson PTJ. In press. Using multi-species occupancy models to improve the characterization and understanding of metacommunity structure. Ecology. [link](http://www.esajournals.org/doi/abs/10.1890/14-1580.1)
 
-- Mihaljevic JR, Joseph MB, Orlofske SA, Paull SH. 2014. The scaling of host density with richness affects the direction, shape, and detectability of diversity-disease relationships. PLoS ONE 9(5): e97812. pdf
+- Mihaljevic JR, Joseph MB, Orlofske SA, Paull SH. 2014. The scaling of host density with richness affects the direction, shape, and detectability of diversity-disease relationships. PLoS ONE 9(5): e97812. [link](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0097812)
 
-- Joseph MB, Mihaljevic JR, Orlofske SA, Paull SH. 2013. Does life history mediate changing disease risk when communities disassemble? Ecology Letters, 16(11): 1405-1412. pdf
+- Joseph MB, Mihaljevic JR, Orlofske SA, Paull SH. 2013. Does life history mediate changing disease risk when communities disassemble? Ecology Letters, 16(11): 1405-1412. [link](http://onlinelibrary.wiley.com/doi/10.1111/ele.12180/abstract)
 
-- Joseph MB, Mihaljevic JR, Arellano AL, Keuneman JG, Preston DL, Cross PC, Johnson PTJ. 2013. Taming wildlife disease: bridging the gap between science and management. Journal of Applied Ecology, 50(3): 702-712. pdf
+- Joseph MB, Mihaljevic JR, Arellano AL, Keuneman JG, Preston DL, Cross PC, Johnson PTJ. 2013. Taming wildlife disease: bridging the gap between science and management. Journal of Applied Ecology, 50(3): 702-712. [link](http://onlinelibrary.wiley.com/doi/10.1111/1365-2664.12084/abstract)
 
-- McMahon TA, Brannelly LA, Chatfield MWH, Johnson PTJ, Joseph MB, McKenzie VJ, Richards-Zawacki CL, Venesky MD, Rohr JR. 2012. Chytrid fungus Batrachochytrium dendrobatidis has nonamphibian hosts and releases chemicals that cause pathology in the absence of infection. Proceedings of the National Academy of Sciences of the United States of America 110(1): 210-215. pdf
+- McMahon TA, Brannelly LA, Chatfield MWH, Johnson PTJ, Joseph MB, McKenzie VJ, Richards-Zawacki CL, Venesky MD, Rohr JR. 2012. Chytrid fungus *Batrachochytrium dendrobatidis* has nonamphibian hosts and releases chemicals that cause pathology in the absence of infection. Proceedings of the National Academy of Sciences of the United States of America 110(1): 210-215. [link](http://www.pnas.org/content/110/1/210.abstract)
 
-- Joseph MB, Piovia-Scott J, Lawler SP, Pope KL. 2011. Indirect effects of introduced trout on Cascades frogs (Rana cascadae) via shared aquatic prey. Freshwater Biology 56 (5): 828-838. pdf
+- Joseph MB, Piovia-Scott J, Lawler SP, Pope KL. 2011. Indirect effects of introduced trout on Cascades frogs (*Rana cascadae*) via shared aquatic prey. Freshwater Biology 56 (5): 828-838. [link](http://onlinelibrary.wiley.com/doi/10.1111/j.1365-2427.2010.02529.x/abstract)
 
-- Joseph MB, Gentles M, Pearse IS. 2011. The parasitoid community of Andricus quercuscalifornicus and its association with gall size, phenology, and location. Biodiversity and Conservation 20 (1): 203-216. pdf
+- Joseph MB, Gentles M, Pearse IS. 2011. The parasitoid community of *Andricus quercuscalifornicus* and its association with gall size, phenology, and location. Biodiversity and Conservation 20 (1): 203-216. [link](http://link.springer.com/article/10.1007%2Fs10531-010-9956-0)
 
-- Karban R, Hodson A, Gruner DS, Lewis EE, Karban J, Joseph MB, Mata T, Strong DR. 2011. Lack of susceptibility of soil-inhabiting Platyprepia virginialis caterpillars, a native arctiid, to entomopathogenic nematodes in nature. Entomologia Experimentalis et Applicata 140 (1): 28-34. pdf
+- Karban R, Hodson A, Gruner DS, Lewis EE, Karban J, Joseph MB, Mata T, Strong DR. 2011. Lack of susceptibility of soil-inhabiting Platyprepia virginialis caterpillars, a native arctiid, to entomopathogenic nematodes in nature. Entomologia Experimentalis et Applicata 140 (1): 28-34. [link](http://onlinelibrary.wiley.com/doi/10.1111/j.1570-7458.2011.01133.x/abstract)
 
 ### CV
 
