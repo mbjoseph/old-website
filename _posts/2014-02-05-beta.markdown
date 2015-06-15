@@ -2,16 +2,15 @@
 layout: post
 title: "Better living through zero-one inflated beta regression"
 date: 2014-02-06 17:10
-permalink: /blog/:year/:month/:day/:title/
 comments: true
-categories: 
+categories:
 ---
 
-Dealing with proportion data on the interval $[0, 1]$ is tricky. I realized this while trying to explain variation in vegetation cover. Unfortunately this is a true proportion, and can't be made into a binary response. Further, true 0's and 1's rule out beta regression. You could arcsine square root transform the data (but shouldn't; Warton and Hui 2011). Enter zero-and-one inflated beta regression. 
+Dealing with proportion data on the interval $[0, 1]$ is tricky. I realized this while trying to explain variation in vegetation cover. Unfortunately this is a true proportion, and can't be made into a binary response. Further, true 0's and 1's rule out beta regression. You could arcsine square root transform the data (but shouldn't; Warton and Hui 2011). Enter zero-and-one inflated beta regression.
 
 The zero-and-one-inflated beta distribution facilitates modeling fractional or proportional data that contains both 0's and 1's (Ospina and Ferrari 2010 - highly recommended). The general idea is to model the response variable (call it $y$) as a mixture of Bernoulli and beta distributions, from which the true 0's and 1's, and the values between 0 and 1 are generated, respectively. The probability density function is
 
-$$ 
+$$
 beinf(y; \alpha, \gamma, \mu, \phi) = \left\{
   \begin{array}{lr}
     \alpha(1 - \gamma) &  y = 0\\
@@ -21,11 +20,11 @@ beinf(y; \alpha, \gamma, \mu, \phi) = \left\{
 \right.
 $$
 
-where $0 < \alpha, \gamma, \mu < 1$, and $\phi>0$. $f(y; \mu, \phi)$ is the probability density function for the beta distribution, parameterized in terms of its mean $\mu$ and precision $\phi$: 
+where $0 < \alpha, \gamma, \mu < 1$, and $\phi>0$. $f(y; \mu, \phi)$ is the probability density function for the beta distribution, parameterized in terms of its mean $\mu$ and precision $\phi$:
 
 $$f(y; \mu, \phi) = \dfrac{\Gamma(\phi)}{\Gamma(\mu \phi) \Gamma((1 - \mu)\phi)} y^{\mu \phi - 1} (1 - y)^{(1 - \mu)\phi - 1}$$
 
-$\alpha$ is a mixture parameter that determines the extent to which the Bernoulli or beta component dominates the pdf. $\gamma$ determines the probability that $y=1$ if it comes from the Bernoulli component. $\mu$ and $\phi$ are the expected value and the precision for the beta component, which is usually parameterized in terms of $p$ and $q$ (Ferrari and Cribari-Neto 2004). $\mu = \frac{p}{p + q}$, and $\phi=p+q$. 
+$\alpha$ is a mixture parameter that determines the extent to which the Bernoulli or beta component dominates the pdf. $\gamma$ determines the probability that $y=1$ if it comes from the Bernoulli component. $\mu$ and $\phi$ are the expected value and the precision for the beta component, which is usually parameterized in terms of $p$ and $q$ (Ferrari and Cribari-Neto 2004). $\mu = \frac{p}{p + q}$, and $\phi=p+q$.
 
 Although ecologists often deal with proportion data, I haven't found any examples of 0 & 1 inflated beta regression in the ecological literature. Closest thing I've found was Nishii and Tanaka (2012) who take a different approach, where values between 0 and 1 are modeled as logit-normal.
 
@@ -73,7 +72,7 @@ n.cont <- length(y.c)
 x.c <- x[which.cont]
 {% endhighlight %}
 
-Now we can specify our model in JAGS, following the factorization of the likelihood given by Ospina and Ferrari (2010), estimate our parameters, and see how well the model performs. 
+Now we can specify our model in JAGS, following the factorization of the likelihood given by Ospina and Ferrari (2010), estimate our parameters, and see how well the model performs.
 
 {% highlight r %}
 # write model
@@ -86,21 +85,21 @@ cat(
   a2 ~ dnorm(0, .001)
   b0 ~ dnorm(0, .001)
   b1 ~ dnorm(0, .001)
-  t0 ~ dnorm(0, .01) 
+  t0 ~ dnorm(0, .01)
   tau <- exp(t0)
-  
+
   # likelihood for alpha
   for (i in 1:n){
     logit(alpha[i]) <- a0 + a1 * x[i] + a2 * x[i] ^ 2
     y.discrete[i] ~ dbern(alpha[i])
   }
-  
+
   # likelihood for gamma
   for (i in 1:n.discrete){
     y.d[i] ~ dbern(mu[i])
     logit(mu[i]) <- b0 + b1 * x.d[i]
   }
-  
+
   # likelihood for mu and tau
   for (i in 1:n.cont){
     y.c[i] ~ dbeta(p[i], q[i])
@@ -112,11 +111,11 @@ cat(
   ", file="beinf.txt"
 )
 require(rjags)
-jd <- list(x=x, y.d=y.d, y.c=y.c, y.discrete = y.discrete, 
+jd <- list(x=x, y.d=y.d, y.c=y.c, y.discrete = y.discrete,
            n.discrete=n.discrete, n.cont = n.cont,
            x.d = x.d, x.c=x.c, n=n)
 mod <- jags.model("beinf.txt", data= jd, n.chains=3, n.adapt=1000)
-out <- coda.samples(mod, c("a0", "a1", "a2", "b0", "b1", "tau"), 
+out <- coda.samples(mod, c("a0", "a1", "a2", "b0", "b1", "tau"),
                     n.iter=6000, n.thin=6)
 # plot(out) check for convergence
 
@@ -140,20 +139,20 @@ for (i in 1:n){
 }
 exd <- melt(expect, varnames=c("iteration", "site"), value.name = "Expectation")
 exd$x <- x[exd$site]
-obsd <- data.frame(x=x, y=y, 
+obsd <- data.frame(x=x, y=y,
                    component = factor(ifelse(y < 1 & y > 0, "Continuous", "Discrete")))
 trued <- data.frame(x=x, mu=mu)
 
-ggplot(pdd) + 
-  geom_line(aes(x=x, y=Pr.discrete, group=iteration), alpha=0.05, color="grey") + 
-  geom_line(aes(x=x, y=Expectation, group=iteration), data=exd, color="blue", alpha=0.05) + 
+ggplot(pdd) +
+  geom_line(aes(x=x, y=Pr.discrete, group=iteration), alpha=0.05, color="grey") +
+  geom_line(aes(x=x, y=Expectation, group=iteration), data=exd, color="blue", alpha=0.05) +
   geom_point(aes(x=x, y=y, fill=component), data=obsd, size=3, color="black",
-             position = position_jitter(width=0, height=.01), pch=21) + 
+             position = position_jitter(width=0, height=.01), pch=21) +
   scale_fill_manual(values = c("red", "black")) +
-  ylab("y") + 
+  ylab("y") +
   geom_line(aes(x=x, y=mu), data=trued, color="green", linetype="dashed") +
   theme_bw()
 {% endhighlight %}
 ![](/images/betareg.png)
 
-Here the posterior probability that $y$ comes from the discrete Bernoulli component is shown in grey, and the posterior expected value for both the Bernoulli and beta components across values of the covariate are shown in blue. The dashed green line shows the true expected value that was used to generate the data. Finally, the observed data are shown as jittered points, color coded as being derived from the continuous beta component, or the discrete Bernoulli component. 
+Here the posterior probability that $y$ comes from the discrete Bernoulli component is shown in grey, and the posterior expected value for both the Bernoulli and beta components across values of the covariate are shown in blue. The dashed green line shows the true expected value that was used to generate the data. Finally, the observed data are shown as jittered points, color coded as being derived from the continuous beta component, or the discrete Bernoulli component.

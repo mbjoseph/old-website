@@ -2,12 +2,11 @@
 layout: post
 title: "Animating the Metropolis algorithm"
 date: 2013-09-08 17:00
-permalink: /blog/:year/:month/:day/:title/
 comments: true
-categories: 
+categories:
 ---
 
-The [Metropolis algorithm](http://jcp.aip.org/resource/1/jcpsa6/v21/i6/p1087_s1?bypassSSO=1), and its generalization ([Metropolis-Hastings algorithm](http://en.wikipedia.org/wiki/Metropolis%E2%80%93Hastings_algorithm)) provide elegant methods for obtaining sequences of random samples from complex probability distributions. When I first read about modern MCMC methods, I had trouble visualizing the convergence of Markov chains in higher dimensional cases. So, I thought I might put together a visualization in a two-dimensional case. 
+The [Metropolis algorithm](http://jcp.aip.org/resource/1/jcpsa6/v21/i6/p1087_s1?bypassSSO=1), and its generalization ([Metropolis-Hastings algorithm](http://en.wikipedia.org/wiki/Metropolis%E2%80%93Hastings_algorithm)) provide elegant methods for obtaining sequences of random samples from complex probability distributions. When I first read about modern MCMC methods, I had trouble visualizing the convergence of Markov chains in higher dimensional cases. So, I thought I might put together a visualization in a two-dimensional case.
 
 I'll use a simple example: estimating a population mean and standard deviation. We'll define some population level parameters, collect some data, then use the Metropolis algorithm to simulate the joint posterior of the mean and standard deviation.
 
@@ -40,7 +39,7 @@ post <- function(x, mu, sigma){
 }
 
 geninits <- function(){
-  list(mu = runif(1, 4, 10), 
+  list(mu = runif(1, 4, 10),
        sigma = runif(1, 2, 6))
 }
 
@@ -60,12 +59,12 @@ for (c in 1:chains){
   theta.post[2, 1] <- inits$sigma
   for (t in 2:iter){
     # theta_star = proposed next values for parameters
-    theta_star <- c(jump(theta.post[1, t-1]), jump(theta.post[2, t-1])) 
+    theta_star <- c(jump(theta.post[1, t-1]), jump(theta.post[2, t-1]))
     pstar <- post(x, mu = theta_star[1], sigma = theta_star[2])  
     pprev <- post(x, mu = theta.post[1, t-1], sigma = theta.post[2, t-1])
     lr <- pstar - pprev
     r <- exp(lr)
-    
+
     # theta_star is accepted if posterior density is higher w/ theta_star
     # if posterior density is not higher, it is accepted with probability r
     # else theta does not change from time t-1 to t
@@ -100,16 +99,16 @@ setwd("metropolis_ex")
 png(file = "metrop%03d.png", width=700, height=350)
   for (i in sequence){
     par(mfrow=c(1, 2))
-    plot(posterior[1, 1, 1:i], posterior[1, 2, 1:i], 
+    plot(posterior[1, 1, 1:i], posterior[1, 2, 1:i],
          type="l", xlim=xlims, ylim=ylims, col="blue",
          xlab="mu", ylab="sigma", main="Markov chains")
-    lines(posterior[2, 1, 1:i], posterior[2, 2, 1:i], 
+    lines(posterior[2, 1, 1:i], posterior[2, 2, 1:i],
           col="purple")
-    lines(posterior[3, 1, 1:i], posterior[3, 2, 1:i], 
+    lines(posterior[3, 1, 1:i], posterior[3, 2, 1:i],
           col="red")
     text(x=7, y=1.2, paste("Iteration ", i), cex=1.5)
-    sm.density(x=cbind(c(posterior[, 1, 1:i]), c(posterior[, 2, 1:i])), 
-               xlab="mu", ylab="sigma", 
+    sm.density(x=cbind(c(posterior[, 1, 1:i]), c(posterior[, 2, 1:i])),
+               xlab="mu", ylab="sigma",
                zlab="", zlim=c(0, .7),
                xlim=xlims, ylim=ylims, col="white")
     title("Posterior density")

@@ -2,14 +2,13 @@
 layout: post
 title: "Visualizing bivariate shrinkage"
 date: 2015-01-20 13:05
-permalink: /blog/:year/:month/:day/:title/
 comments: true
 categories:
 ---
 
-Inspired by [this post](http://www.coppelia.io/2013/08/visualising-shrinkage/) about visualizing shrinkage on Coppelia, and [this thread](http://stats.stackexchange.com/questions/51186/what-would-be-an-illustrative-picture-for-linear-mixed-models) about visualizing mixed models on Stack Exchange, I started thinking about how to visualize shrinkage in more than one dimension. One might find themselves in this situation with a varying slope, varying intercept hierarichical (mixed effects) model, a model with two varying intercepts, etc. Then I found a great bivariate shrinkage plot in [Doug Bates' lme4 book](http://lme4.r-forge.r-project.org/lMMwR/lrgprt.pdf), Figure 3.8. 
+Inspired by [this post](http://www.coppelia.io/2013/08/visualising-shrinkage/) about visualizing shrinkage on Coppelia, and [this thread](http://stats.stackexchange.com/questions/51186/what-would-be-an-illustrative-picture-for-linear-mixed-models) about visualizing mixed models on Stack Exchange, I started thinking about how to visualize shrinkage in more than one dimension. One might find themselves in this situation with a varying slope, varying intercept hierarichical (mixed effects) model, a model with two varying intercepts, etc. Then I found a great bivariate shrinkage plot in [Doug Bates' lme4 book](http://lme4.r-forge.r-project.org/lMMwR/lrgprt.pdf), Figure 3.8.
 
-Here is a snippet to reproduce a similar bivariate shrinkage plot in [ggplot2](http://ggplot2.org/), adding a color coded probability density surface and contours for the estimated multivariate normal distribution of random effects, using the same [sleep study data](http://www.inside-r.org/packages/cran/lme4/docs/sleepstudy) that Bates used. 
+Here is a snippet to reproduce a similar bivariate shrinkage plot in [ggplot2](http://ggplot2.org/), adding a color coded probability density surface and contours for the estimated multivariate normal distribution of random effects, using the same [sleep study data](http://www.inside-r.org/packages/cran/lme4/docs/sleepstudy) that Bates used.
 
 {% highlight r %}
 ## 2d shrikage for random slope, random intercept model
@@ -37,7 +36,7 @@ m1_intercepts <- coef(m1)$Subject[, 1]
 m1_slopes <- coef(m1)$Subject[, 2]
 
 d <- data.frame(interceptF = m0_intercepts,
-                slopeF = m0_slopes, 
+                slopeF = m0_slopes,
                 interceptR = m1_intercepts,
                 slopeR = m1_slopes
                 )
@@ -48,43 +47,43 @@ names(df_ell) <- c("intercept", "slope")
 
 # bivariate normal density surface
 lo <- 200 # length.out of x and y grid
-xvals <- seq(from = min(df_ell$intercept) - .1 * abs(min(df_ell$intercept)), 
-             to = max(df_ell$intercept) + .05 * abs(max(df_ell$intercept)), 
+xvals <- seq(from = min(df_ell$intercept) - .1 * abs(min(df_ell$intercept)),
+             to = max(df_ell$intercept) + .05 * abs(max(df_ell$intercept)),
              length.out = lo)
-yvals <- seq(from = min(df_ell$slope) - .4 * abs(min(df_ell$slope)), 
-             to = max(df_ell$slope) + .1 * abs(max(df_ell$slope)), 
+yvals <- seq(from = min(df_ell$slope) - .4 * abs(min(df_ell$slope)),
+             to = max(df_ell$slope) + .1 * abs(max(df_ell$slope)),
              length.out = lo)
 
 z <- matrix(0, lo, lo)
 for (i in 1:lo) {
   x = xvals
   y = yvals[i]
-  z[,i] = dmvnorm(cbind(x,y), 
+  z[,i] = dmvnorm(cbind(x,y),
                   mean = fixef(m1),
                   sigma = VarCorr(m1)$Subject)
 }
 
 mv_ranef <- melt(z)
 names(mv_ranef) <- c("x", "y", "z")
-mv_ranef$x <- xvals[mv_ranef$x] 
+mv_ranef$x <- xvals[mv_ranef$x]
 mv_ranef$y <- yvals[mv_ranef$y]
 
 
-p <- ggplot(d) + 
-  geom_raster(aes(x=x, y=y, fill=z), data=mv_ranef) + 
-  scale_fill_gradient(low="white", high="red") + 
+p <- ggplot(d) +
+  geom_raster(aes(x=x, y=y, fill=z), data=mv_ranef) +
+  scale_fill_gradient(low="white", high="red") +
   guides(fill=FALSE) +
-  geom_path(data=df_ell, aes(x=intercept, y=slope), size=.5) + 
-  geom_contour(aes(x=x, y=y, z=z), data=mv_ranef, size=.1, color="black") + 
-  geom_segment(aes(x=interceptF, y=slopeF, 
-                   xend=interceptR, yend=slopeR), 
-               arrow = arrow(length = unit(0.3, "cm")), 
-               alpha=.7) + 
-  xlab("Estimated intercepts") + 
-  ylab("Estimated slopes") + 
+  geom_path(data=df_ell, aes(x=intercept, y=slope), size=.5) +
+  geom_contour(aes(x=x, y=y, z=z), data=mv_ranef, size=.1, color="black") +
+  geom_segment(aes(x=interceptF, y=slopeF,
+                   xend=interceptR, yend=slopeR),
+               arrow = arrow(length = unit(0.3, "cm")),
+               alpha=.7) +
+  xlab("Estimated intercepts") +
+  ylab("Estimated slopes") +
   theme(legend.position="none") +
-  ggtitle("Bivariate shrinkage plot") + 
-  theme_bw()  + 
+  ggtitle("Bivariate shrinkage plot") +
+  theme_bw()  +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 p
 {% endhighlight %}

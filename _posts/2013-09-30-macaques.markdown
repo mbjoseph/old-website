@@ -2,20 +2,19 @@
 layout: post
 title: "How heavy is the Siberut macaque? A Bayesian phylogenetic approach"
 date: 2013-09-30 11:00
-permalink: /blog/:year/:month/:day/:title/
 comments: true
-categories: 
+categories:
 ---
 
-Among-species comparisons can include phylogenetic information to account for non-independence  arising from shared evolutionary history. Often, phylogenetic topologies and branch lengths are not known exactly, but are estimated with uncertainty. This uncertainty can be accounted for using methods recently described in a neat paper called [Bayesian models for comparative analysis integrating phylogenetic uncertainty](http://www.biomedcentral.com/1471-2148/12/102) by 
-[de Villemereuil](http://devillemereuil.legtux.org/) et al. Here, I'll demonstrate the method by estimating the body mass of the [Siberut macaque](http://www.iucnredlist.org/details/39795/0) (*Macaca siberu*). 
+Among-species comparisons can include phylogenetic information to account for non-independence  arising from shared evolutionary history. Often, phylogenetic topologies and branch lengths are not known exactly, but are estimated with uncertainty. This uncertainty can be accounted for using methods recently described in a neat paper called [Bayesian models for comparative analysis integrating phylogenetic uncertainty](http://www.biomedcentral.com/1471-2148/12/102) by
+[de Villemereuil](http://devillemereuil.legtux.org/) et al. Here, I'll demonstrate the method by estimating the body mass of the [Siberut macaque](http://www.iucnredlist.org/details/39795/0) (*Macaca siberu*).
 
 ![](/images/Macaca-fascicularis.jpg)
 
 (Not a siberut macaque)
-       
+
 ### Building the phylogeny
-First, I downloaded a nexus file with DNA sequences from [A molecular phylogeny of living primates](http://www.plosgenetics.org/article/info:doi/10.1371/journal.pgen.1001342#s4) by Polina Perelman et al., available [here](http://treebase.org/treebase-web/search/study/summary.html?id=12186) on [TreeBASE](http://treebase.org). I culled the nexus file to include only the 14 species in the genus *Macaca*, and saved it as macaques.nex. 
+First, I downloaded a nexus file with DNA sequences from [A molecular phylogeny of living primates](http://www.plosgenetics.org/article/info:doi/10.1371/journal.pgen.1001342#s4) by Polina Perelman et al., available [here](http://treebase.org/treebase-web/search/study/summary.html?id=12186) on [TreeBASE](http://treebase.org). I culled the nexus file to include only the 14 species in the genus *Macaca*, and saved it as macaques.nex.
 
 I used [MrBayes](http://mrbayes.sourceforge.net/) to estimate the macaque phylogeny with the following file (analysis.nex):
 
@@ -30,7 +29,7 @@ begin mrbayes;
 end;
 {% endhighlight %}
 
-Calling MrBayes from within R: 
+Calling MrBayes from within R:
 
 {% highlight r %}
 system("mb 'analysis.nex' > log.txt &")
@@ -46,7 +45,7 @@ Macaque weight data are available as part of a (much) larger dataset on the [bod
 ### Body mass model
 We will account for phylogenetic non-independence by considering average species weights to be multivariate normally distributed around a within-genus mean, with a covariance matrix $\Sigma$ that reflects phylogenetic distance (see [de Villemereuil et al.][5]). The off-diagonal elements of this matrix are scaled by Pagel's $\lambda$, which reflects the degree of phylogenetic signal in the data.
 
-With the help of the [ape](http://cran.r-project.org/web/packages/ape/) and [MASS](http://cran.r-project.org/web/packages/MASS/index.html) packages, covariance and precision matrices can be constructed for the trees comprising the posterior phylogeny. 
+With the help of the [ape](http://cran.r-project.org/web/packages/ape/) and [MASS](http://cran.r-project.org/web/packages/MASS/index.html) packages, covariance and precision matrices can be constructed for the trees comprising the posterior phylogeny.
 
 {% highlight r %}
 require(ape)
@@ -68,7 +67,7 @@ for (i in 1:(K/2)){
 }
 {% endhighlight %}
 
-Then we can fit the model with OpenBUGS, estimating the missing body mass of *M. siberu*, accounting for uncertainty in the phylogeny's topology and branch lengths. 
+Then we can fit the model with OpenBUGS, estimating the missing body mass of *M. siberu*, accounting for uncertainty in the phylogeny's topology and branch lengths.
 
 {% highlight r %}
 # load body mass data
@@ -85,12 +84,12 @@ cat("
     sigma ~ dunif(0, 10)
     tau <- 1 / (sigma * sigma)
     lambda ~ dunif(0, 1)
-    
+
     for (k in 1:ntree){
       p[k] <- 1/ntree
     }
     K ~ dcat(p[])
-    
+
     for (i in 1:nspec){
       for (j in 1:nspec){
         LAMBDA[i, j] <- 1 + (lambda - 1) * (1 - equals(i, j))
@@ -98,15 +97,15 @@ cat("
       }
     }
     }
-    ", 
+    ",
     file="phylomod.txt")
-d 
-bugsd <- list(weight = d$lmass, nspec=nrow(d), 
+d
+bugsd <- list(weight = d$lmass, nspec=nrow(d),
            ntree = K, inv.mat=inv.mat)
 
 # run model
 out <- bugs(bugsd, inits = NULL,
-            parameters.to.save = c("sigma", "alpha", "K", "weight", 
+            parameters.to.save = c("sigma", "alpha", "K", "weight",
                                    "TAU", "lambda"),
             n.iter=3000, model.file="phylomod.txt", DIC=F, n.thin=5,
             n.chains=3)
@@ -114,7 +113,7 @@ out
 coda.out <- as.mcmc.bugs(out)
 ggd <- ggs(coda.out)
 
-ggs_density(ggd, "weight") + theme_bw() + 
+ggs_density(ggd, "weight") + theme_bw() +
   ggtitle(expression(paste("Predicted body size of ", italic("Macaca siberu")))) +
   theme(axis.title.y = element_blank()) +
   xlab("Log(body mass in kg)")

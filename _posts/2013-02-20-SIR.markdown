@@ -3,8 +3,7 @@ layout: post
 title: "Interactive two-host SIR model"
 date: 2013-02-20 15:02
 comments: true
-permalink: /blog/:year/:month/:day/:title/
-categories: 
+categories:
 ---
 This is an example of interfacing R, shiny, and deSolve to produce an interactive environment where users can explore model behavior by altering parameters in an easy to use GUI.
 

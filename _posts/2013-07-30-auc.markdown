@@ -3,21 +3,20 @@ layout: post
 title: "Occupancy model fit & AUC"
 date: 2013-07-30 15:02
 comments: true
-permalink: /blog/:year/:month/:day/:title/
 categories:
 ---
-Occupancy models are used to understand species distributions while 
-accounting for imperfect detection. In this post, I'll demonstrate a 
-method to evaluate the performance of occupancy models based on the 
-area under a receiver operating characteristic curve (AUC), as published 
-last year by Elise Zipkin and colleagues in 
-[Ecological Applications](http://www.esajournals.org/doi/abs/10.1890/11-1936.1). 
+Occupancy models are used to understand species distributions while
+accounting for imperfect detection. In this post, I'll demonstrate a
+method to evaluate the performance of occupancy models based on the
+area under a receiver operating characteristic curve (AUC), as published
+last year by Elise Zipkin and colleagues in
+[Ecological Applications](http://www.esajournals.org/doi/abs/10.1890/11-1936.1).
 
-Suppose we are to fit a multi-year occupancy model for one species. We 
-will evaluate the fit based on how well the model predicts occupancy in 
-the final year of the project. Start by simulating some data 
-(for details on the structure of these simulated data, refer to 
-[this post](http://mbjoseph.github.io/blog/2013/02/24/com_occ/) and 
+Suppose we are to fit a multi-year occupancy model for one species. We
+will evaluate the fit based on how well the model predicts occupancy in
+the final year of the project. Start by simulating some data
+(for details on the structure of these simulated data, refer to
+[this post](http://mbjoseph.github.io/blog/2013/02/24/com_occ/) and
 references therein):
 
 {% highlight r %}
@@ -48,7 +47,7 @@ rho <- logit(p_rho)
 p_alpha1 <- .6
 alpha1 <- logit(p_alpha1)
 
-# response to treatment 
+# response to treatment
 p_alpha2 <- .5
 alpha2 <- logit(p_alpha2)
 
@@ -71,13 +70,13 @@ for (j in 1:nsite) {
   for (t in 1:nyear) {
     if (t == 1) {
       # logit psi
-      lpsi[j, t] <- beta + rho * z0[j] + 
+      lpsi[j, t] <- beta + rho * z0[j] +
           covariate[j] * alpha1 + treat[j] * alpha2 +
           alpha3 * covariate[j] * treat[j]
       psi[j, t] <- antilogit(lpsi[j, t])
       z[j, t] <- rbinom(1, 1, psi[j, t]) # true occupancy state
     } else {
-      lpsi[j, t] <- beta + rho * z[j, t - 1] + 
+      lpsi[j, t] <- beta + rho * z[j, t - 1] +
         covariate[j] * alpha1 + treat[j] * alpha2 +
         alpha3 * covariate[j] * treat[j]
       psi[j, t] <- antilogit(lpsi[j, t])
@@ -101,23 +100,23 @@ for (j in 1:nsite) {
 
 # Subset the data to exclude the final year, which we'll use for model validation
 xsub <- x
-xsub[, nyear, ] <- NA 
+xsub[, nyear, ] <- NA
 {% endhighlight %}
 
-For illustration, I included a strong interaction between treatment 
-and the continuous site level covariate (could be elevation, area, etc). As such, a 
-measure of model fit such as AUC ought to identify a saturated model as 
-the best fitting. Handily, AUC is a derived parameter, and common 
-occupancy model parameters can be used to estimate a posterior. 
-To generate a posterior AUC, we need predicted occupancy probabilities 
-($\psi$) and realized occupancy states ($Z$) in the final year. Predicted occupancy 
-probabilities can be produced using data from previous years, and 
-realized occupancy states are assumed to be represented by the posterior 
-for $Z$ generated from a single-year model, fit to the data from the final 
-year of the study. 
+For illustration, I included a strong interaction between treatment
+and the continuous site level covariate (could be elevation, area, etc). As such, a
+measure of model fit such as AUC ought to identify a saturated model as
+the best fitting. Handily, AUC is a derived parameter, and common
+occupancy model parameters can be used to estimate a posterior.
+To generate a posterior AUC, we need predicted occupancy probabilities
+($\psi$) and realized occupancy states ($Z$) in the final year. Predicted occupancy
+probabilities can be produced using data from previous years, and
+realized occupancy states are assumed to be represented by the posterior
+for $Z$ generated from a single-year model, fit to the data from the final
+year of the study.
 
 ### Fitting a saturated model
-Begin by modeling occupancy probabilities as a function of both covariates 
+Begin by modeling occupancy probabilities as a function of both covariates
 and their interaction, predicting $\psi$ in the final year:
 
 {% highlight r %}
@@ -138,22 +137,22 @@ cat("
     a1 <- log(pa1 / (1 - pa1))
     a2 <- log(pa2 / (1 - pa2))
     a3 <- log(pa3 / (1 - pa3))
-    
+
     #### occupancy model
     for (j in 1:nsite) {
       z0[j] ~ dbern(rho0)
-      logit(psi[j, 1]) <- beta + rho * z0[j] + 
-        a1 * covariate[j] + a2 * treat[j] + 
+      logit(psi[j, 1]) <- beta + rho * z0[j] +
+        a1 * covariate[j] + a2 * treat[j] +
         a3 * covariate[j] * treat[j]
       z[j, 1] ~ dbern(psi[j, 1])
       for (t in 2:nyear) {
-        logit(psi[j, t]) <- beta + rho * z[j, t-1] + 
-          a1 * covariate[j] + a2 * treat[j] + 
+        logit(psi[j, t]) <- beta + rho * z[j, t-1] +
+          a1 * covariate[j] + a2 * treat[j] +
           a3 * covariate[j] * treat[j]
         z[j, t] ~ dbern(psi[j, t])
       }
     }
-    
+
     #### observation model
     for (j in 1:nsite){
       for (t in 1:nyear){
@@ -189,7 +188,7 @@ require(rjags)
 
 # build model
 nchain <- 3
-ocmod <- jags.model(file = "saturated.txt", inits = inits, 
+ocmod <- jags.model(file = "saturated.txt", inits = inits,
                     data = data, n.chains = nchain)
 
 # specify MCMC settings and start sampling
@@ -197,13 +196,13 @@ nburn <- 2000
 niter <- 2000
 nthin <- 2
 update(ocmod, n.iter = nburn)
-out <- coda.samples(ocmod, n.iter = niter, 
+out <- coda.samples(ocmod, n.iter = niter,
                     thin=nthin, variable.names = params)
 {% endhighlight %}
 
-Now that we have our posteriors for $\psi$ at each site in the final 
-year, we can fit a single-year model to the final year's data to 
-estimate $Z$. 
+Now that we have our posteriors for $\psi$ at each site in the final
+year, we can fit a single-year model to the final year's data to
+estimate $Z$.
 
 {% highlight r %}
 xlast <- x[,nyear,]
@@ -221,15 +220,15 @@ cat("
     a1 <- log(pa1 / (1 - pa1))
     a2 <- log(pa2 / (1 - pa2))
     a3 <- log(pa3 / (1 - pa3))
-    
+
     #### occupancy model
     for (j in 1:nsite) {
-      logit(psi[j]) <- beta + 
-        a1 * covariate[j] + a2 * treat[j] + 
+      logit(psi[j]) <- beta +
+        a1 * covariate[j] + a2 * treat[j] +
         a3 * covariate[j] * treat[j]
       z[j] ~ dbern(psi[j])
     }
-    
+
     #### observation model
     for (j in 1:nsite){
       mu[j] <- z[j] * p
@@ -241,8 +240,8 @@ cat("
     ", fill=TRUE, file="saturated2.txt")
 
 # bundle data
-data2 <- list(x = xlast, nrep = nrep, 
-              nsite = nsite, covariate=covariate, 
+data2 <- list(x = xlast, nrep = nrep,
+              nsite = nsite, covariate=covariate,
               treat=treat)
 
 # initial values
@@ -259,16 +258,16 @@ inits <- function() {
 params2 <- c("p", "beta", "pa1", "pa2", "pa3", "z")
 
 # build model
-ocmod2 <- jags.model(file = "saturated2.txt", inits = inits, 
+ocmod2 <- jags.model(file = "saturated2.txt", inits = inits,
                     data = data2, n.chains = nchain)
 
 # start sampling
 update(ocmod2, n.iter = nburn)
-out2 <- coda.samples(ocmod2, n.iter = niter, 
+out2 <- coda.samples(ocmod2, n.iter = niter,
                     thin=nthin, variable.names = params2)
 {% endhighlight %}
 
-To set up the data for AUC calculations, produce site by 
+To set up the data for AUC calculations, produce site by
 iteration arrays for $\psi$ and $Z$:
 
 {% highlight r %}
@@ -286,8 +285,8 @@ for (j in 1:nsite){
 }
 {% endhighlight %}
 
-Now generate the posterior for AUC and store data on the true and false 
-positive rates to produce ROC curves. 
+Now generate the posterior for AUC and store data on the true and false
+positive rates to produce ROC curves.
 
 {% highlight r %}
 require(ROCR)
@@ -307,13 +306,13 @@ for (i in 1:(nstore * nchain)){
 require(reshape2)
 fprm <- melt(fpr, varnames=c("iter", "site"))
 tprm <- melt(tpr, varnames = c("iter", "site"))
-ROC1 <- data.frame(fpr = fprm$value, 
+ROC1 <- data.frame(fpr = fprm$value,
                    tpr = tprm$value,
                    iter = rep(fprm$iter, 2))
 {% endhighlight %}
 
 ### Fitting a simpler model
-Having fitted a saturated model, we can now fit a simpler model that 
+Having fitted a saturated model, we can now fit a simpler model that
 includes only main effects:
 
 {% highlight r %}
@@ -331,20 +330,20 @@ cat("
     pa2 ~ dbeta(1, 1)
     a1 <- log(pa1 / (1 - pa1))
     a2 <- log(pa2 / (1 - pa2))
-    
+
     #### occupancy model
     for (j in 1:nsite) {
       z0[j] ~ dbern(rho0)
-      logit(psi[j, 1]) <- beta + rho * z0[j] + 
-        a1 * covariate[j] + a2 * treat[j] 
+      logit(psi[j, 1]) <- beta + rho * z0[j] +
+        a1 * covariate[j] + a2 * treat[j]
       z[j, 1] ~ dbern(psi[j, 1])
       for (t in 2:nyear) {
-        logit(psi[j, t]) <- beta + rho * z[j, t-1] + 
-          a1 * covariate[j] + a2 * treat[j] 
+        logit(psi[j, t]) <- beta + rho * z[j, t-1] +
+          a1 * covariate[j] + a2 * treat[j]
         z[j, t] ~ dbern(psi[j, t])
       }
     }
-    
+
     #### observation model
     for (j in 1:nsite){
       for (t in 1:nyear){
@@ -377,12 +376,12 @@ inits <- function() {
 params <- c("p", "beta", "rho", "psi", "pa1", "pa2")
 
 # build model
-ocmod <- jags.model(file = "mainef.txt", inits = inits, 
+ocmod <- jags.model(file = "mainef.txt", inits = inits,
                     data = data, n.chains = nchain)
 
 # specify MCMC settings and start sampling
 update(ocmod, n.iter = nburn)
-out <- coda.samples(ocmod, n.iter = niter, 
+out <- coda.samples(ocmod, n.iter = niter,
                     thin=nthin, variable.names = params)
 
 # Fit a single-year model for the final year to estimate Z ##
@@ -397,14 +396,14 @@ cat("
     pa2 ~ dbeta(1, 1)
     a1 <- log(pa1 / (1 - pa1))
     a2 <- log(pa2 / (1 - pa2))
-    
+
     #### occupancy model
     for (j in 1:nsite) {
-      logit(psi[j]) <- beta + 
+      logit(psi[j]) <- beta +
         a1 * covariate[j] + a2 * treat[j]
       z[j] ~ dbern(psi[j])
     }
-    
+
     #### observation model
     for (j in 1:nsite){
       mu[j] <- z[j] * p
@@ -416,8 +415,8 @@ cat("
     ", fill=TRUE, file="mainef2.txt")
 
 # bundle data
-data2 <- list(x = xlast, nrep = nrep, 
-              nsite = nsite, covariate=covariate, 
+data2 <- list(x = xlast, nrep = nrep,
+              nsite = nsite, covariate=covariate,
               treat=treat)
 
 # initial values
@@ -434,12 +433,12 @@ inits <- function() {
 params2 <- c("p", "beta", "pa1", "pa2", "z")
 
 # build model
-ocmod2 <- jags.model(file = "mainef2.txt", inits = inits, 
+ocmod2 <- jags.model(file = "mainef2.txt", inits = inits,
                      data = data2, n.chains = nchain)
 
 # start sampling
 update(ocmod2, n.iter = nburn)
-out2 <- coda.samples(ocmod2, n.iter = niter, 
+out2 <- coda.samples(ocmod2, n.iter = niter,
                      thin=nthin, variable.names = params2)
 
 
@@ -472,16 +471,16 @@ for (i in 1:(nstore * nchain)){
 
 fprm <- melt(fpr, varnames=c("iter", "site"))
 tprm <- melt(tpr, varnames = c("iter", "site"))
-ROC2 <- data.frame(fpr = fprm$value, 
+ROC2 <- data.frame(fpr = fprm$value,
                    tpr = tprm$value,
                    iter = rep(fprm$iter, 2))
 {% endhighlight %}
 
 ### Comparing models
 How well did our models predict occupancy in the final year of the study,
-and was one better than the other? 
-We can answer this question by inspecting posteriors for AUC (larger 
-values are better), and the ROC curves. 
+and was one better than the other?
+We can answer this question by inspecting posteriors for AUC (larger
+values are better), and the ROC curves.
 
 {% highlight r %}
 p1 <- ggplot(ROC1, aes(x=fpr, y=tpr, group=iter)) +
@@ -496,13 +495,13 @@ p2 <- ggplot(ROC2, aes(x=fpr, y=tpr, group=iter)) +
   ylab("True positive rate") +
   xlab("False positive rate") + theme_bw()
 
-p3 <- ggplot(data.frame(AUC = c(AUC1, AUC2), 
-              Model = rep(c("Saturated model", "Main effects model "), 
+p3 <- ggplot(data.frame(AUC = c(AUC1, AUC2),
+              Model = rep(c("Saturated model", "Main effects model "),
                           each=length(AUC1))),
-       aes(x=AUC, fill=Model, color=Model)) + 
-  geom_density(alpha=.8) + theme_bw() + ylab("Posterior density") + 
+       aes(x=AUC, fill=Model, color=Model)) +
+  geom_density(alpha=.8) + theme_bw() + ylab("Posterior density") +
   xlab("Area under receiver operating characteristic curve (AUC)") +
-  scale_colour_manual(values=c("red", "blue")) + 
+  scale_colour_manual(values=c("red", "blue")) +
   scale_fill_manual(values=c("red", "blue")) +
   theme(legend.position = "top") +
   theme(legend.title=element_blank()) +
@@ -513,7 +512,7 @@ grid.arrange(p3, arrangeGrob(p2, p1, ncol=2), ncol=1)
 {% endhighlight %}
 ![](/images/ROC.png)
 
-As expected, the model that generated the data fits better than the 
-model that excludes the strong interaction term. Note that AUC reflects 
-the accuracy of model predictions, and does not penalize model 
-complexity. 
+As expected, the model that generated the data fits better than the
+model that excludes the strong interaction term. Note that AUC reflects
+the accuracy of model predictions, and does not penalize model
+complexity.

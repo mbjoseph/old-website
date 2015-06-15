@@ -3,7 +3,6 @@ layout: post
 title: "Clarifying vague interactions"
 date: 2013-08-18 02:00
 comments: true
-permalink: /blog/:year/:month/:day/:title/
 categories: 
 ---
 
@@ -11,13 +10,13 @@ For some reason, authors occasionally present linear model results with vague or
 
 Suppose you have discovered a statistically significant interaction effect between two continous covariates in the context of a linear model.
 
-$$ y_i \sim Norm(\mu_i, \sigma^2) $$    
-    
+$$ y_i \sim Norm(\mu_i, \sigma^2) $$
+
 $$ \mu_i = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \beta_3 x_{1i} x_{2i} $$
 
 Suppose also that you have decided to present the model results with the following table, and the reviewers requested no additional information:
 
-|            |**Estimate**   |**SE**   |**P-value**|    
+|            |**Estimate**   |**SE**   |**P-value**|
 |:-----------|:--------------:|:---------:|--------:|
 |$\beta_0$  | -0.004 | 0.037 | 0.921    |
 |$\beta_1$ | 1.055 | 0.038 | <0.05|
@@ -25,7 +24,7 @@ Suppose also that you have decided to present the model results with the followi
 |$\beta_3$  | 2.002 | 0.040 | <0.05|
 |RSE|0.517| | |
 | | | | |
-      
+
 Without knowing the range of covariate values observed, this table gives an incomplete story about relationship between the covariates and the response variable. Assuming the reader has a decent guess about the range of possible values for the covariates, this is what they can piece together:
 
 {% highlight r %}
@@ -48,7 +47,7 @@ d <- data.frame(mu=mu, x1=X$x1, x2=X$x2)
 p1 <- ggplot(d, aes(x1, x2, z=mu)) + theme_bw() +
   geom_tile(aes(fill=mu)) +
   stat_contour(binwidth=1.5) +
-  scale_fill_gradient2(low="blue", mid="white", high="orange") + 
+  scale_fill_gradient2(low="blue", mid="white", high="orange") +
   xlab("Covariate 1") + ylab("Covariate 2") +
   ggtitle("Contour plot of the linear predictor")
 p1
@@ -56,12 +55,12 @@ p1
 
 ![](/images/contour.png)
 
-If the reader does not know where the observations fell in this plot, it is  difficult to know whether the response variable was increasing or decreasing with each covariate across the range of observed values. 
+If the reader does not know where the observations fell in this plot, it is  difficult to know whether the response variable was increasing or decreasing with each covariate across the range of observed values.
 
 Consider the following two cases, where the observed covariate combinations are included as points.
 
 ![](/images/contour2.png)
 
-These two plots tell somewhat different stories despite identical model parameters. On the left, across the range of observed covariates, the expected value of $y$ increases as either covariate increases and the interaction term affects the magnitude this increase. On the right, increases in covariate 1 or 2 could increase or decrease $\mu$, depending on the value of the other covariate. 
+These two plots tell somewhat different stories despite identical model parameters. On the left, across the range of observed covariates, the expected value of $y$ increases as either covariate increases and the interaction term affects the magnitude this increase. On the right, increases in covariate 1 or 2 could increase or decrease $\mu$, depending on the value of the other covariate.
 
-I won't get into the nitty gritty of how to present interaction effects (but if you're interested, there are articles out there, e.g. [Lamina et al. 2012](http://www.ncbi.nlm.nih.gov/pubmed/22652348)). My main goal here is to point out the ambiguity associated with only presenting a table of parameter estimates. My preference would be that authors at least present observed covariate ranges (or better yet values), and provide a plot that illustrates the interaction. 
+I won't get into the nitty gritty of how to present interaction effects (but if you're interested, there are articles out there, e.g. [Lamina et al. 2012](http://www.ncbi.nlm.nih.gov/pubmed/22652348)). My main goal here is to point out the ambiguity associated with only presenting a table of parameter estimates. My preference would be that authors at least present observed covariate ranges (or better yet values), and provide a plot that illustrates the interaction.

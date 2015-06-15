@@ -3,8 +3,7 @@ layout: post
 title: "Dynamic community occupancy modeling with R and JAGS"
 date: 2013-02-24 15:02
 comments: true
-permalink: /blog/:year/:month/:day/:title/
-categories: 
+categories:
 ---
 This post is intended to provide a simple example of how to construct and make inferences on a multi-species multi-year occupancy model using R, JAGS, and the ‘rjags’ package. This is not intended to be a standalone tutorial on dynamic community occupancy modeling. Useful primary literature references include MacKenzie et al. (2002), Kery and Royle (2007), Royle and Kery (2007), Russell et al. (2009), and Dorazio et al. (2010). Royle and Dorazio’s Heirarchichal Modeling and Inference in Ecology also provides a clear explanation of simple one species occupancy models, multispecies occupancy models, and dynamic (multiyear) occupancy models, among other things. There’s also a wealth of code provided [here](https://sites.google.com/site/communitymodeling/) by Elise Zipkin, J. Andrew Royle, and others.
 
@@ -158,13 +157,13 @@ model{
     beta[i] ~ dnorm(mubeta, taubeta)
     rho[i] ~ dnorm(murho, taurho)
   }
-  
+
   # occupancy states
   for (j in 1:nsite) {
     for (i in 1:nspec) {
       z0[j, i] ~ dbern(rho0[i])
-      logit(psi[j, i, 1]) <- beta[i] + rho[i] * z0[j, i] 
-      z[j, i, 1] ~ dbern(psi[j, i, 1]) 
+      logit(psi[j, i, 1]) <- beta[i] + rho[i] * z0[j, i]
+      z[j, i, 1] ~ dbern(psi[j, i, 1])
       for (t in 2:nyear) {
         logit(psi[j, i, t]) <- beta[i] + rho[i] * z[j, i, t-1]
         z[j, i, t] ~ dbern(psi[j, i, t])
@@ -173,16 +172,16 @@ model{
   }
 
   #### detection model
-	for(i in 1:nspec){ 
+	for(i in 1:nspec){
 		lp[i] ~ dnorm(mup, taup)
 		p[i] <- (exp(lp[i])) / (1 + exp(lp[i]))
 	}
-	
+
   #### observation model
   for (j in 1:nsite){
     for (i in 1:nspec){
       for (t in 1:nyear){
-        mu[j, i, t] <- z[j, i, t] * p[i] 
+        mu[j, i, t] <- z[j, i, t] * p[i]
         for (k in 1:nrep){
           x[j, i, t, k] ~ dbern(mu[j, i, t])
         }
@@ -199,7 +198,7 @@ Next, bundle up the data.
 data <- list(x = x, nrep = nrep, nsite = nsite, nspec = nspec, nyear = nyear)
 {% endhighlight %}
 
-Provide initial values. 
+Provide initial values.
 
 {% highlight r %}
 zinit <- array(dim = c(nsite, nspec, nyear))
@@ -239,5 +238,3 @@ plot(out)
 {% endhighlight %}
 
 ![](http://www.colorado.edu/ebio/gradstudents/joseph/figure/unnamed-chunk-101.png)
-
-

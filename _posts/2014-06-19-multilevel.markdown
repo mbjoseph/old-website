@@ -4,7 +4,6 @@ title: "Multilevel modeling of community composition with imperfect detection"
 date: 2014-06-19 9:00
 comments: true
 author: Joseph Mihaljevic & Max Joseph
-permalink: /blog/:year/:month/:day/:title/
 categories:
 ---
 

@@ -2,22 +2,21 @@
 layout: post
 title: "Stochastic search variable selection in JAGS"
 date: 2014-03-22 12:16
-permalink: /blog/:year/:month/:day/:title/
 comments: true
-categories: 
+categories:
 ---
 
-Stochastic search variable selection (SSVS) identifies promising subsets of multiple regression covariates via Gibbs sampling ([George and McCulloch 1993](http://aima.eecs.berkeley.edu/~russell/classes/cs294/f05/papers/george+mcculloch-1993.pdf)). Here's a short SSVS demo with [JAGS](http://mcmc-jags.sourceforge.net/) and [R](http://www.r-project.org/). 
+Stochastic search variable selection (SSVS) identifies promising subsets of multiple regression covariates via Gibbs sampling ([George and McCulloch 1993](http://aima.eecs.berkeley.edu/~russell/classes/cs294/f05/papers/george+mcculloch-1993.pdf)). Here's a short SSVS demo with [JAGS](http://mcmc-jags.sourceforge.net/) and [R](http://www.r-project.org/).
 
 Assume we have a multiple regression problem:
 
 $$\boldsymbol{Y} \sim N_n(\boldsymbol{X \beta}, \sigma^2 \boldsymbol{I})$$
 
-We suspect only a subset of the elements of $\boldsymbol{\beta}$ are non-zero, i.e. some of the covariates have no effect. 
+We suspect only a subset of the elements of $\boldsymbol{\beta}$ are non-zero, i.e. some of the covariates have no effect.
 
-Assume $\boldsymbol{\beta}$ arises from one of two normal mixture components, depending on a latent variable $\gamma_i$: 
+Assume $\boldsymbol{\beta}$ arises from one of two normal mixture components, depending on a latent variable $\gamma_i$:
 
-$$ 
+$$
 \beta_i \mid \gamma_i  \sim \left\{
   \begin{array}{lr}
     N(0, \tau^2_i) &  \gamma_i = 0\\
@@ -26,7 +25,7 @@ $$
 \right.
 $$
 
-$\tau_i$ is positive but small s.t. $\beta_i$ is close to zero when $\gamma_i = 0$. $c_i$ is large enough to allow reasonable deviations from zero when $\gamma_i = 1$. The prior probability that covariate $i$ has a nonzero effect is $Pr(\gamma_i = 1) = p_i$. Important subtleties about priors are covered in George and McCulloch (1993) and elsewhere. 
+$\tau_i$ is positive but small s.t. $\beta_i$ is close to zero when $\gamma_i = 0$. $c_i$ is large enough to allow reasonable deviations from zero when $\gamma_i = 1$. The prior probability that covariate $i$ has a nonzero effect is $Pr(\gamma_i = 1) = p_i$. Important subtleties about priors are covered in George and McCulloch (1993) and elsewhere.
 
 Let's simulate a dataset in which some covariates have strong effects on the linear predictor, and other don't: suppose we have 20 candidate variables, but only 60 observations.
 
@@ -45,10 +44,10 @@ for (i in 1:ncov){
 }
 
 included <- rbinom(ncov, 1, p_inclusion)
-coefs <- rnorm(n=ncov, 
-               mean=0, 
-               sd=ifelse(included==1, 
-                         sqrt(var_beta * c), 
+coefs <- rnorm(n=ncov,
+               mean=0,
+               sd=ifelse(included==1,
+                         sqrt(var_beta * c),
                          sqrt(var_beta)
                          )
                )
@@ -109,21 +108,21 @@ for (i in 1:ncov){
   labels[i] <- paste("beta[", i, "]", sep="")
 }
 xdf <- data.frame(Parameter = labels, value = 1:ncov)
-p1 <- ggs_caterpillar(outdf, "beta", X=xdf) + 
+p1 <- ggs_caterpillar(outdf, "beta", X=xdf) +
   theme_classic() +
-  geom_vline(xintercept = 0, linetype = "longdash") + 
-  geom_point(data=data.frame(coefs, pos = 1:ncov), 
-              aes(x=coefs, y=pos), size=5, col="green4", alpha=.7) + 
-  xlab("Value") + 
-  ylab("Coefficient") + 
-  geom_hline(yintercept = 1:ncov, alpha=.05) + 
+  geom_vline(xintercept = 0, linetype = "longdash") +
+  geom_point(data=data.frame(coefs, pos = 1:ncov),
+              aes(x=coefs, y=pos), size=5, col="green4", alpha=.7) +
+  xlab("Value") +
+  ylab("Coefficient") +
+  geom_hline(yintercept = 1:ncov, alpha=.05) +
   scale_y_continuous(breaks=seq(0, ncov, 1))
 
 df <- data.frame(probs=probs, coefs = coefs)
-p2 <- ggplot(df, aes(x=abs(coefs), y=probs)) + 
-  geom_point(size=5, alpha=.7) + 
-  theme_classic() + 
-  xlab("Absolute value of true coefficient") + 
+p2 <- ggplot(df, aes(x=abs(coefs), y=probs)) +
+  geom_point(size=5, alpha=.7) +
+  theme_classic() +
+  xlab("Absolute value of true coefficient") +
   ylab("Posterior probability of non-zeroness")
 
 grid.arrange(p1, p2, ncol=2)

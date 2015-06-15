@@ -2,12 +2,11 @@
 layout: post
 title: "Modeling habitat diversity and species richness"
 date: 2013-04-20 15:02
-permalink: /blog/:year/:month/:day/:title/
 comments: true
-categories: 
+categories:
 ---
 
-How does habitat diversity affect species richness? Perhaps intuition suggests that habitat diversity increases species richness by facilitating niche or resource partitioning among species. But, for a fixed area, as habitat heterogeneity increases, the area that can be allocated to each habitat type decreases. In a recent paper, [Allouche and colleagues (2012)](http://www.pnas.org/content/109/43/17495.abstract) provide a theoretical and empirical treatment of the habitat area-heterogeneity trade-off’s consequences for species richness. Both treatments of the subject indicated that the relationship between habitat heterogeneity and species richness may be unimodal, rather than strictly increasing. 
+How does habitat diversity affect species richness? Perhaps intuition suggests that habitat diversity increases species richness by facilitating niche or resource partitioning among species. But, for a fixed area, as habitat heterogeneity increases, the area that can be allocated to each habitat type decreases. In a recent paper, [Allouche and colleagues (2012)](http://www.pnas.org/content/109/43/17495.abstract) provide a theoretical and empirical treatment of the habitat area-heterogeneity trade-off’s consequences for species richness. Both treatments of the subject indicated that the relationship between habitat heterogeneity and species richness may be unimodal, rather than strictly increasing.
 
 ![](/images/heterogeneity_richness.png)
 
@@ -23,7 +22,7 @@ The image above illustrates the probability of establishing for five species acr
 
 It is assumed that all individuals that occupy a patch have the same per-timestep probabilities of death and reproduction. If an individual reproduces, the number of offspring it produces is a Poisson distributed random variable, and each individual offspring attempts to colonize one randomly selected site. At each time-step, every site has an equal probability of a colonization attempt by an individual from each species in the regional pool. Every habitat patch holds only one individual.
 
-Offspring and immigrants from the regional pool do not displace individuals from habitat patches when they attempt to colonize. In empty sites, offspring receive colonization priority, with regional colonization occurring after breeding. When multiple offspring or immigrants from the regional pool could establish in an empty site, one successful individual is randomly chosen to establish regardless of species identity. 
+Offspring and immigrants from the regional pool do not displace individuals from habitat patches when they attempt to colonize. In empty sites, offspring receive colonization priority, with regional colonization occurring after breeding. When multiple offspring or immigrants from the regional pool could establish in an empty site, one successful individual is randomly chosen to establish regardless of species identity.
 
 ### Parameters ###
 The following parameters are supplied to the function `alloucheIBM()`:
@@ -194,7 +193,7 @@ Here are the intervals:
 
 ![](/images/envhet.png)
 
-Now, for each interval, we can iteratively run the model and track species richness. Because species richness tends to vary through time, let’s take the mean of the final 100 timesteps as a measure of species richness for each model run, and record the standard deviation to track variability. 
+Now, for each interval, we can iteratively run the model and track species richness. Because species richness tends to vary through time, let’s take the mean of the final 100 timesteps as a measure of species richness for each model run, and record the standard deviation to track variability.
 
 {% highlight r %}
 n.iter <- 3 # number of iterations per interval

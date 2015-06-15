@@ -2,7 +2,6 @@
 layout: post
 title: "Spatial data extraction around buffered points in R"
 date: 2014-11-08 21:40
-permalink: /blog/:year/:month/:day/:title/
 comments: true
 categories:
 ---

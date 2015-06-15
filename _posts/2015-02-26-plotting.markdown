@@ -2,41 +2,38 @@
 layout: post
 title: "Why I think twice before editing plots in Powerpoint, Illustrator, Inkscape, etc."
 date: 2015-02-26 14:00
-permalink: /blog/:year/:month/:day/:title/
 comments: true
 categories:
 ---
 
-Thanks to a nice post by Meghan Duffy on the Dynamic Ecology blog ([How do you make figures?](https://dynamicecology.wordpress.com/2015/02/25/how-do-you-make-figures/)), we have some empirical evidence that many figures made in R by ecologists are secondarily edited in other programs including MS Powerpoint, Adobe Illustrator, Inkscape, and Photoshop. 
-This may not be advisable* for two reasons: **reproducibility** and **bonus learning**. 
+Thanks to a nice post by Meghan Duffy on the Dynamic Ecology blog ([How do you make figures?](https://dynamicecology.wordpress.com/2015/02/25/how-do-you-make-figures/)), we have some empirical evidence that many figures made in R by ecologists are secondarily edited in other programs including MS Powerpoint, Adobe Illustrator, Inkscape, and Photoshop.
+This may not be advisable* for two reasons: **reproducibility** and **bonus learning**.
 
 ### Reproducibility
 
-R is nice because results are relatively easy to reproduce. 
-It's free, and your code serves as a written record of what was done. 
-When figures are edited outside of R, they can be much more difficult to reproduce. 
-Independent of whether I am striving to maximize the reproducibility of my work for others, it behooves me to save time for my future self, ensuring that we (I?) can quickly update my own figures throughout the process of paper writing, submission, rewriting, resubmission, and so on. 
+R is nice because results are relatively easy to reproduce.
+It's free, and your code serves as a written record of what was done.
+When figures are edited outside of R, they can be much more difficult to reproduce.
+Independent of whether I am striving to maximize the reproducibility of my work for others, it behooves me to save time for my future self, ensuring that we (I?) can quickly update my own figures throughout the process of paper writing, submission, rewriting, resubmission, and so on.
 
-I had to learn this the hard way. 
-The following figure was my issue: initially I created a rough version in R, edited it in Inkscape (~30 minutes invested), and ended up with a ["final"](http://www.phdcomics.com/comics/archive.php?comicid=1531) version for submission. 
+I had to learn this the hard way.
+The following figure was my issue: initially I created a rough version in R, edited it in Inkscape (~30 minutes invested), and ended up with a ["final"](http://www.phdcomics.com/comics/archive.php?comicid=1531) version for submission.
 
 ![](/images/s3.svg)
 
-Turns out that I had to remake the figure three times throughout the revision process (for the better). Eventually I realized that it was far more efficient to make the plot in R than to process it outside of R. 
+Turns out that I had to remake the figure three times throughout the revision process (for the better). Eventually I realized that it was far more efficient to make the plot in R than to process it outside of R.
 
-In retrospect, two things are clear: 
+In retrospect, two things are clear:
 
 1. My energy allocation strategy was not conducive to the revision process. I wasted time trying to make my "final" version look good in Inkscape, when I could have invested time to figure out how to make the figure as I wanted it in R. The payoff from this time investment will be a function of how much manipulation is done outside R, how hard it is to get the desired result in R, and how many times a figure will be re-made.  
-2. I probably could have found a better way to display the data. Another post perhaps. 
+2. I probably could have found a better way to display the data. Another post perhaps.
 
 ### Learning
 
-Forcing myself to remake the figure exactly as I wanted it using only R had an unintended side effect: I learned more about base graphics in R. 
-Now, when faced with similar situations, I can make similar plots *much* faster, because I know more graphical parameters and plotting functions. 
-In contrast, point-and-click programs are inherently slow because I'm manually manipulating elements, usually with a mouse, and my mouse isn't getting any faster. 
+Forcing myself to remake the figure exactly as I wanted it using only R had an unintended side effect: I learned more about base graphics in R.
+Now, when faced with similar situations, I can make similar plots *much* faster, because I know more graphical parameters and plotting functions.
+In contrast, point-and-click programs are inherently slow because I'm manually manipulating elements, usually with a mouse, and my mouse isn't getting any faster.
 
  <nowiki>*different strokes for different folks, of course</nowiki>
 
 (Figure from [Does life history mediate changing disease risk when communities disassemble?](http://onlinelibrary.wiley.com/doi/10.1111/ele.12180/suppinfo))
-
-

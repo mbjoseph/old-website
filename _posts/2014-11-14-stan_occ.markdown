@@ -2,7 +2,6 @@
 layout: post
 title: "Dynamic occupancy models in Stan"
 date: 2014-11-14 07:36
-permalink: /blog/:year/:month/:day/:title/
 comments: true
 categories:
 ---

@@ -2,17 +2,16 @@
 layout: post
 title: "Quantifying uncertainty around R-squared for generalized linear mixed models"
 date: 2013-08-22 20:00
-permalink: /blog/:year/:month/:day/:title/
 comments: true
-categories: 
+categories:
 ---
-People love $R^2$. As such, when Nakagawa and Schielzeth published 
+People love $R^2$. As such, when Nakagawa and Schielzeth published
 [A general and simple method for obtaining $R^2$ from generalized linear mixed-effects models](http://onlinelibrary.wiley.com/doi/10.1111/j.2041-210x.2012.00261.x/abstract) in the journal *Methods in Ecology and Evolution* earlier this year, ecologists (amid increasing use of generalized linear mixed models (GLMMs)) [rejoiced](http://ecologyforacrowdedplanet.wordpress.com/2013/02/26/r-squared-for-mixed-models/). Now there's [an R function](http://jslefche.wordpress.com/2013/03/13/r2-for-linear-mixed-effects-models/) that automates  $R^2$ calculations for GLMMs fit with the `lme4` package.
 
-$R^2$ is usually reported as a point estimate of the variance explained by a model, using the maximum likelihood estimates of the model parameters and ignoring uncertainty around these estimates. Nakagawa and Schielzeth (2013) noted that it may be desirable to quantify the uncertainty around $R^2$ using MCMC sampling. So, here we are. 
+$R^2$ is usually reported as a point estimate of the variance explained by a model, using the maximum likelihood estimates of the model parameters and ignoring uncertainty around these estimates. Nakagawa and Schielzeth (2013) noted that it may be desirable to quantify the uncertainty around $R^2$ using MCMC sampling. So, here we are.
 
 ### Background
-$R^2$ quantifies the proportion of observed variance explained by a statistical model. When it is large (near 1), much of the variance in the data is explained by the model. 
+$R^2$ quantifies the proportion of observed variance explained by a statistical model. When it is large (near 1), much of the variance in the data is explained by the model.
 
 Nakagawa and Schielzeth (2013) present two $R^2$ statistics for generalized linear mixed models:
 
@@ -26,18 +25,18 @@ $$ \sigma^2_f = var(\boldsymbol{X \beta}) $$
 
 $\boldsymbol{X}$ is the design matrix of the fixed effects, and $\boldsymbol{\beta}$ is the vector of fixed effects estimates.  
 
-$\sum_{l=1}^{u}\sigma^2_l$ represents the sum the variance components for all of $u$ random effects. $\sigma^2_d$ is the distribution-specific variance ([Nakagawa & Schielzeth 2010](http://www.researchgate.net/publication/44693680_Repeatability_for_Gaussian_and_non-Gaussian_data_a_practical_guide_for_biologists/file/79e4150b04929933f3.pdf)), and $\sigma^2_e$ represents added dispersion. 
+$\sum_{l=1}^{u}\sigma^2_l$ represents the sum the variance components for all of $u$ random effects. $\sigma^2_d$ is the distribution-specific variance ([Nakagawa & Schielzeth 2010](http://www.researchgate.net/publication/44693680_Repeatability_for_Gaussian_and_non-Gaussian_data_a_practical_guide_for_biologists/file/79e4150b04929933f3.pdf)), and $\sigma^2_e$ represents added dispersion.
 
-2) Conditional $R^2_{GLMM(c)}$ represents the proportion of variance explained by the fixed and random effects combined: 
+2) Conditional $R^2_{GLMM(c)}$ represents the proportion of variance explained by the fixed and random effects combined:
 
 $$ R^2_{GLMM(c)} = \frac{\sigma^2_f + \sum_{l=1}^{u}\sigma^2_l}{\sigma^2_f + \sum_{l=1}^{u}\sigma^2_l + \sigma^2_d + \sigma^2_e} $$
 
 ### Point-estimation of $R^2_{GLMM}$
-Here, I'll follow the example of an overdispersed Poisson GLMM provided in the supplement to Nakagawa & Schielzeth, available [here](http://ecologyforacrowdedplanet.wordpress.com/2013/02/26/r-squared-for-mixed-models/). This is their most complicated example, and the simpler ones ought to be relatively straightforward for those that are interested in normal or binomial GLMMs. 
+Here, I'll follow the example of an overdispersed Poisson GLMM provided in the supplement to Nakagawa & Schielzeth, available [here](http://ecologyforacrowdedplanet.wordpress.com/2013/02/26/r-squared-for-mixed-models/). This is their most complicated example, and the simpler ones ought to be relatively straightforward for those that are interested in normal or binomial GLMMs.
 
 
 {% highlight r %}
-# First, simulate data (code from Nakagawa & Schielzeth 2013): 
+# First, simulate data (code from Nakagawa & Schielzeth 2013):
 # 12 different populations n = 960
 Population <- gl(12, 80, 960)
 
@@ -57,8 +56,8 @@ Habitat <- factor(rep(rep(c("dry", "wet"), each = 4), 120))
 Treatment <- factor(rep(c("Cont", "Exp"), 480))
 
 # Data combined in a dataframe
-Data <- data.frame(Population = Population, 
-    Container = Container, Sex = Sex, 
+Data <- data.frame(Population = Population,
+    Container = Container, Sex = Sex,
     Habitat = Habitat, Treatment = Treatment)
 
 # Subset the design matrix (only females express colour morphs)
@@ -70,12 +69,12 @@ ContainerE <- rnorm(120, 0, sqrt(0.05))
 
 # generation of response values on link scale (!) based on fixed effects,
 # random effects and residual errors
-EggLink <- with(DataF, 
-                  1.1 + 
-                  0.5 * (as.numeric(Treatment) - 1) + 
-                  0.1 * (as.numeric(Habitat) - 1) + 
-                  PopulationE[Population] + 
-                  ContainerE[Container] + 
+EggLink <- with(DataF,
+                  1.1 +
+                  0.5 * (as.numeric(Treatment) - 1) +
+                  0.1 * (as.numeric(Habitat) - 1) +
+                  PopulationE[Population] +
+                  ContainerE[Container] +
                   rnorm(480, 0, sqrt(0.1)))  # adds overdispersion
 
 # data generation (on data scale!) based on Poisson distribution
@@ -86,7 +85,7 @@ write.csv(DataF, file = "BeetlesFemale.csv", row.names = F)
 {% endhighlight %}
 
 
-Having simulated a dataset, calculate the $R^2$ point-estimates, using the `lme4` package to fit the model. 
+Having simulated a dataset, calculate the $R^2$ point-estimates, using the `lme4` package to fit the model.
 
 
 {% highlight r %}
@@ -105,11 +104,11 @@ Data <- read.csv("BeetlesFemale.csv")
 Unit <- factor(1:length(Data$Egg))
 
 # Fit null model without fixed effects (but including all random effects)
-m0 <- lmer(Egg ~ 1 + (1 | Population) + (1 | Container) + (1 | Unit), 
+m0 <- lmer(Egg ~ 1 + (1 | Population) + (1 | Container) + (1 | Unit),
     family = "poisson", data = Data)
 
 # Fit alternative model including fixed and all random effects
-mF <- lmer(Egg ~ Treatment + Habitat + (1 | Population) + (1 | Container) + 
+mF <- lmer(Egg ~ Treatment + Habitat + (1 | Population) + (1 | Container) +
     (1 | Unit), family = "poisson", data = Data)
 
 # View model fits for both models
@@ -128,14 +127,14 @@ VarF <- var(as.vector(fixef(mF) %*% t(mF@X)))
 
 # R2GLMM(m) - marginal R2GLMM see Equ. 29 and 30 and Table 2 fixef(m0)
 # returns the estimate for the intercept of null model
-R2m <- VarF/(VarF + VarCorr(mF)$Container[1] + 
-               VarCorr(mF)$Population[1] + VarCorr(mF)$Unit[1] + 
+R2m <- VarF/(VarF + VarCorr(mF)$Container[1] +
+               VarCorr(mF)$Population[1] + VarCorr(mF)$Unit[1] +
                 log(1 + 1/exp(as.numeric(fixef(m0))))
             )
 
 # R2GLMM(c) - conditional R2GLMM for full model Equ. XXX, XXX
 R2c <- (VarF + VarCorr(mF)$Container[1] + VarCorr(mF)$Population[1])/
-         (VarF + VarCorr(mF)$Container[1] + VarCorr(mF)$Population[1] + 
+         (VarF + VarCorr(mF)$Container[1] + VarCorr(mF)$Population[1] +
            VarCorr(mF)$Unit[1] + log(1 + 1/exp(as.numeric(fixef(m0))))
          )
 
@@ -144,10 +143,10 @@ cbind(R2m, R2c)
 {% endhighlight %}
 
 
-Having stored our point estimates, we can now turn to Bayesian methods instead, and generate $R^2$ posteriors. 
+Having stored our point estimates, we can now turn to Bayesian methods instead, and generate $R^2$ posteriors.
 
 ### Posterior uncertainty in $R^2_{GLMM}$
-We need to fit two models in order to get the needed parameters for $R^2_{GLMM}$. First, a model that includes all random effects, but only an intercept fixed effect is fit to estimate the distribution specific variance $\sigma^2_d$. Second, we fit a model that includes all random and all fixed effects to estimate the remaining variance components. 
+We need to fit two models in order to get the needed parameters for $R^2_{GLMM}$. First, a model that includes all random effects, but only an intercept fixed effect is fit to estimate the distribution specific variance $\sigma^2_d$. Second, we fit a model that includes all random and all fixed effects to estimate the remaining variance components.
 
 First I'll clean up the data that we'll feed to [JAGS](http://mcmc-jags.sourceforge.net/):
 
@@ -201,7 +200,7 @@ model{
   for (i in 1:nobs){
     Egg[i] ~ dpois(mu[i])
     log(mu[i]) <- cont[Container[i]] + pop[Population[i]] + unit[i]
-    unit[i] ~ dnorm(alpha, tau.unit) 
+    unit[i] ~ dnorm(alpha, tau.unit)
   }
 }
     ", fill=T, file="pois_intercept.txt")
@@ -210,9 +209,9 @@ nstore <- 2000
 nthin <- 20
 ni <- nstore*nthin
 require(rjags)
-int_mod <- jags.model("pois_intercept.txt", 
-                      data=jags_d[-c(2, 3)], # exclude unused data 
-                      n.chains=3, 
+int_mod <- jags.model("pois_intercept.txt",
+                      data=jags_d[-c(2, 3)], # exclude unused data
+                      n.chains=3,
                       n.adapt=5000)
 
 vars <- c("sd.pop", "sd.cont", "sd.unit", "alpha")
@@ -255,14 +254,14 @@ model{
     Egg[i] ~ dpois(mu[i])
     log(mu[i]) <- cont[Container[i]] + pop[Population[i]] + unit[i]
     mu_f[i] <- alpha + beta1 * Treatment[i] + beta2 * Habitat[i]
-    unit[i] ~ dnorm(mu_f[i], tau.unit) 
+    unit[i] ~ dnorm(mu_f[i], tau.unit)
   }
 }
     ", fill=T, file="pois_cov.txt")
 
-cov_mod <- jags.model("pois_cov.txt", 
+cov_mod <- jags.model("pois_cov.txt",
                       data=jags_d,
-                      n.chains=3, 
+                      n.chains=3,
                       n.adapt=5000)
 
 vars2 <- c("sd.pop", "sd.cont", "sd.unit", "alpha", "beta1", "beta2")
@@ -271,7 +270,7 @@ cov_out <- coda.samples(cov_mod, n.iter=ni, thin=nthin,
 {% endhighlight %}
 
 
-For every MCMC draw, we can calculate $R^2_{GLMM}$, generating posteriors for both the marginal and conditional values. 
+For every MCMC draw, we can calculate $R^2_{GLMM}$, generating posteriors for both the marginal and conditional values.
 
 
 {% highlight r %}
@@ -292,10 +291,10 @@ fixed_expect <- array(dim = c(nstore, jags_d$nobs))
 varF <- rep(NA, nstore)
 for (i in 1:nstore) {
     fixed_expect[i, ] <- beta_mat[i, ] %*% t(Xmat)
-    varF[i] <- var(fixed_expect[i, ]) 
+    varF[i] <- var(fixed_expect[i, ])
 }
 
-# Step 2: calculate remaining variance components 
+# Step 2: calculate remaining variance components
 # among container variance
 varCont <- subset(d_cov, Parameter == "sd.cont")$value^2
 # among population variance
@@ -305,7 +304,7 @@ varUnit <- subset(d_cov, Parameter == "sd.unit")$value^2
 # distribution variance (Table 2, Nakagawa & Schielzeth 2013)
 varDist <- log(1/exp(alpha_int) + 1)
 
-# Finally, calculate posterior R-squared values 
+# Finally, calculate posterior R-squared values
 # marginal
 postR2m <- varF/(varF + varCont + varPop + varUnit + varDist)
 # conditional
@@ -314,12 +313,12 @@ postR2c <- (varF + varCont + varPop)/
 
 # compare posterior R-squared values to point estimates
 par(mfrow = c(1, 2))
-hist(postR2m, main = "Marginal R-squared", 
-        ylab = "Posterior density", 
+hist(postR2m, main = "Marginal R-squared",
+        ylab = "Posterior density",
         xlab = NULL, breaks = 20)
 abline(v = R2m, col = "blue", lwd = 4)
-hist(postR2c, main = "Conditional R-squared", 
-        ylab = "Posterior density", 
+hist(postR2c, main = "Conditional R-squared",
+        ylab = "Posterior density",
         xlab = NULL, breaks = 25)
 abline(v = R2c, col = "blue", lwd = 4)
 {% endhighlight %}
@@ -336,16 +335,16 @@ Some may be wondering whether the parameter estimates generated with `lme4` are 
 par(mfrow = c(1, 2))
 require(mcmcplots)
 caterplot(int_out, style = "plain")
-caterpoints(c(m0@fixef, 
-              attr(VarCorr(m0)$Container, "stddev"), 
-              attr(VarCorr(m0)$Population, "stddev"), 
+caterpoints(c(m0@fixef,
+              attr(VarCorr(m0)$Container, "stddev"),
+              attr(VarCorr(m0)$Population, "stddev"),
               attr(VarCorr(m0)$Unit, "stddev")))
 title("Intercept model BCIs & point estimates")
 
 caterplot(cov_out, style = "plain")
-caterpoints(c(mF@fixef, 
-              attr(VarCorr(mF)$Container, "stddev"), 
-              attr(VarCorr(mF)$Population, "stddev"), 
+caterpoints(c(mF@fixef,
+              attr(VarCorr(mF)$Container, "stddev"),
+              attr(VarCorr(mF)$Population, "stddev"),
               attr(VarCorr(mF)$Unit, "stddev")))
 title("Covariate model BCIs & point estimates")
 {% endhighlight %}

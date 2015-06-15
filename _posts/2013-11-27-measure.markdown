@@ -2,20 +2,19 @@
 layout: post
 title: "Errors-in-variables models in stan"
 date: 2013-11-27 17:10
-permalink: /blog/:year/:month/:day/:title/
 comments: true
-categories: 
+categories:
 ---
 
-In a [previous post](http://mbjoseph.github.io/blog/2013/05/27/typeII/), I gave a cursory overview of how prior information about covariate measurement error can reduce bias in linear regression. 
-In the comments, [Rasmus Bååth](http://www.sumsar.net/) asked about estimation in the absence of strong priors. 
-Here, I'll describe a Bayesian approach for estimation and correction for covariate measurement error using a latent-variable based [errors-in-variables model](http://en.wikipedia.org/wiki/Errors-in-variables_models) that does not rely on strong prior information. 
-Recall that this matters because error in covariate measurements tends to bias slope estimates towards zero. 
+In a [previous post](http://mbjoseph.github.io/blog/2013/05/27/typeII/), I gave a cursory overview of how prior information about covariate measurement error can reduce bias in linear regression.
+In the comments, [Rasmus Bååth](http://www.sumsar.net/) asked about estimation in the absence of strong priors.
+Here, I'll describe a Bayesian approach for estimation and correction for covariate measurement error using a latent-variable based [errors-in-variables model](http://en.wikipedia.org/wiki/Errors-in-variables_models) that does not rely on strong prior information.
+Recall that this matters because error in covariate measurements tends to bias slope estimates towards zero.
 
 ![](/images/m2.gif)
 
-For what follows, we'll assume a simple linear regression, in which continuous covariates are measured with error. 
-True covariate values are considered latent variables, with repeated measurements of covariate values arising from a normal distribution with a mean equal to the true value, and some measurement error $\sigma_x$. 
+For what follows, we'll assume a simple linear regression, in which continuous covariates are measured with error.
+True covariate values are considered latent variables, with repeated measurements of covariate values arising from a normal distribution with a mean equal to the true value, and some measurement error $\sigma_x$.
 We can represent the latent variables in the model as circles, and observables as boxes:
 
 ![](/images/lv.svg)
@@ -28,11 +27,11 @@ $$ x^{obs}_{ij} \sim Normal(x_i, \sigma_x) $$
 
 $$ y_i \sim Normal(\alpha + \beta x_i, \sigma_y) $$
 
-The trick here is to use repeated measurements of the covariates to estimate and correct for measurement error. 
-In order for this to be valid, the true covariate values cannot vary across repeat measurements. 
-If the covariate was individual weight, you would have to ensure that the true weight did not vary across repeat measurements (for me, frogs urinating during handling would violate this assumption). 
+The trick here is to use repeated measurements of the covariates to estimate and correct for measurement error.
+In order for this to be valid, the true covariate values cannot vary across repeat measurements.
+If the covariate was individual weight, you would have to ensure that the true weight did not vary across repeat measurements (for me, frogs urinating during handling would violate this assumption).
 
-Below, I'll simulate some data of this type in R. I'm assuming that we randomly select some sampling units to remeasure covariate values, and each is remeasured `n.reps` times. 
+Below, I'll simulate some data of this type in R. I'm assuming that we randomly select some sampling units to remeasure covariate values, and each is remeasured `n.reps` times.
 
 
 {% highlight r %}
@@ -54,18 +53,18 @@ indx <- c(1:n, rep(which.repeated, each = n.reps - 1))
 indx <- sort(indx)
 nobs <- length(indx)
 xobs <- x[indx] + xerr
-plot(x[indx], xobs, 
-    xlab = "True covariate value", 
+plot(x[indx], xobs,
+    xlab = "True covariate value",
     ylab = "Observed covariate value")
 abline(0, 1, lty = 2)
-segments(x0 = x[indx], x1 = x[indx], 
+segments(x0 = x[indx], x1 = x[indx],
     y0 = x[indx], y1 = xobs, col = "red")
 abline(v = x[which.repeated], col = "green", lty = 3)
 {% endhighlight %}
 
 ![](/images/measure1.png)
 
-Here, the discrepancy due to measurement error is shown as a red segment, and the sample units that were measured three times are highlighted with green dashed lines. 
+Here, the discrepancy due to measurement error is shown as a red segment, and the sample units that were measured three times are highlighted with green dashed lines.
 
 I'll use [stan](http://mc-stan.org/) to estimate the model parameters, because I'll be refitting the model to new data sets repeatedly below, and stan is faster than [JAGS](http://mcmc-jags.sourceforge.net/) for these models.
 
@@ -94,7 +93,7 @@ model {
   beta ~ normal(0,100);
   sigmay ~ uniform(0,1000);
   sigmax ~ uniform(0,1000);
-  
+
   // model structure  
   for (i in 1:nobs){
     xobs[i] ~ normal(x[indx[i]], sigmax);
@@ -103,11 +102,11 @@ model {
     y[i] ~ normal(alpha + beta*x[i], sigmay);
   }
 }
-  ", 
+  ",
     file = "latent_x.stan")
 {% endhighlight %}
 
-With the model specified, estimate the parameters. 
+With the model specified, estimate the parameters.
 
 {% highlight r %}
 library(rstan)
@@ -116,13 +115,13 @@ stan_d <- c("y", "xobs", "nobs", "n", "indx")
 chains <- 3
 iter <- 1000
 thin <- 1
-mod1 <- stan(file = "latent_x.stan", data = stan_d, 
-    chains = chains, iter = iter, 
+mod1 <- stan(file = "latent_x.stan", data = stan_d,
+    chains = chains, iter = iter,
     thin = thin)
 {% endhighlight %}
 
 
-How did we do? Let's compare the true vs. estimated covariate values for each sample unit. 
+How did we do? Let's compare the true vs. estimated covariate values for each sample unit.
 
 
 {% highlight r %}
@@ -151,8 +150,8 @@ for (i in 1:n) {
 }
 
 lims <- c(min(Xd), max(Xd))
-plot(x, Xd[, 3], xlab = "True covariate value", 
-    ylab = "Estimated covariate value", 
+plot(x, Xd[, 3], xlab = "True covariate value",
+    ylab = "Estimated covariate value",
     col = "purple", pch = 19, ylim = lims)
 abline(0, 1, lty = 2)
 segments(x0 = x, x1 = x, y0 = Xd[, 1], y1 = Xd[, 2], col = "purple")
@@ -160,16 +159,16 @@ segments(x0 = x, x1 = x, y0 = Xd[, 1], y1 = Xd[, 2], col = "purple")
 
 ![](/images/measure2.png)
 
-Here purple marks the posterior for the covariate values, and the dashed black line shows the one-to-one line that we would expect if the estimates exactly matched the true values. 
-In addition to estimating the true covariate values, we may wish to check to see how well we estimated the standard deviation of the measurement error in our covariate. 
+Here purple marks the posterior for the covariate values, and the dashed black line shows the one-to-one line that we would expect if the estimates exactly matched the true values.
+In addition to estimating the true covariate values, we may wish to check to see how well we estimated the standard deviation of the measurement error in our covariate.
 
 
 {% highlight r %}
-hist(posteriors$sigmax, breaks = 20, 
-    main = "Posterior for measurement error", 
+hist(posteriors$sigmax, breaks = 20,
+    main = "Posterior for measurement error",
     xlab = "Measurement standard deviation")
 abline(v = xsd, col = "red", lwd = 2)
-legend("topright", legend = "True value", col = "red", 
+legend("topright", legend = "True value", col = "red",
     lty = 1, bty = "n", lwd = 2)
 {% endhighlight %}
 
@@ -177,9 +176,9 @@ legend("topright", legend = "True value", col = "red",
 
 ### How many sample units need repeat measurements?
 
-You may want to know how many sample units need to be repeatedly measured to adequately estimate the degree of covariate measurement error. 
+You may want to know how many sample units need to be repeatedly measured to adequately estimate the degree of covariate measurement error.
 For instance, if $\sigma_x = 1$, how does the precision in our estimate of $\sigma_x$ improve as more sample units are repeatedly measured?
-Let's see what happens when we repeatedly measure covariate values for $1, 2, ..., N$ randomly selected sampling units. 
+Let's see what happens when we repeatedly measure covariate values for $1, 2, ..., N$ randomly selected sampling units.
 
 {% highlight r %}
 n.repeated <- 1:n
@@ -195,7 +194,7 @@ for (i in n.repeated) {
     nobs <- length(indx)
     xobs <- x[indx] + xerr
     stan_d <- c("y", "xobs", "nobs", "n", "indx")
-    mod <- stan(fit = mod1, data = stan_d, chains = chains, 
+    mod <- stan(fit = mod1, data = stan_d, chains = chains,
         iter = iter, thin = thin)
     posteriors <- extract(mod)
     post.sdx[i, 1:2] <- HDI(posteriors$sigmax)
@@ -203,22 +202,22 @@ for (i in n.repeated) {
 }
 
 # Plot the relationship b/t number of sampling units revisited & sdx
-plot(x = n.repeated, y = rep(xsd, length(n.repeated)), 
-    type = "l", lty = 2, 
-    ylim = c(0, max(post.sdx)), 
-    xlab = "Number of sampling units measured three times", 
+plot(x = n.repeated, y = rep(xsd, length(n.repeated)),
+    type = "l", lty = 2,
+    ylim = c(0, max(post.sdx)),
+    xlab = "Number of sampling units measured three times",
     ylab = "Estimated measurement error")
-segments(x0 = n.repeated, x1 = n.repeated, 
-    y0 = post.sdx[, 1], y1 = post.sdx[, 2], 
+segments(x0 = n.repeated, x1 = n.repeated,
+    y0 = post.sdx[, 1], y1 = post.sdx[, 2],
     col = "red")
 points(x = n.repeated, y = post.sdx[, 3], col = "red")
-legend("topright", legend = c("True value", "Posterior estimate"), 
-    col = c("black", "red"), lty = c(2, 1), 
+legend("topright", legend = c("True value", "Posterior estimate"),
+    col = c("black", "red"), lty = c(2, 1),
     pch = c(NA, 1), bty = "n")
 {% endhighlight %}
 
 ![](/images/measure4.png)
 
-Looking at this plot, you could eyeball the number of sample units that should be remeasured when designing a study. 
-Realistically, you would want to explore how this number depends on the true amount of measurement error, and also simulate multiple realizations (rather than just one) for each scenario. 
-Using a similar approach, you might also evaluate whether it's more efficient to remeasure more sample units, or invest in more repeated measurements per sample unit. 
+Looking at this plot, you could eyeball the number of sample units that should be remeasured when designing a study.
+Realistically, you would want to explore how this number depends on the true amount of measurement error, and also simulate multiple realizations (rather than just one) for each scenario.
+Using a similar approach, you might also evaluate whether it's more efficient to remeasure more sample units, or invest in more repeated measurements per sample unit.

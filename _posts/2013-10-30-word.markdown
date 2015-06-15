@@ -2,24 +2,23 @@
 layout: post
 title: "R and my divorce from Word"
 date: 2013-10-30 13:10
-permalink: /blog/:year/:month/:day/:title/
 comments: true
-categories: 
+categories:
 ---
 
 ![](/images/axe-murderer.jpg)
 
-Being in grad school, I do a lot of scholarly writing that requires associated or embedded R analyses, figures, and tables, plus bibliographies. 
+Being in grad school, I do a lot of scholarly writing that requires associated or embedded R analyses, figures, and tables, plus bibliographies.
 
 Microsoft Word makes this unnecessarily difficult.
 
-Many tools are now available to break free from [the tyranny of Word](http://www.antipope.org/charlie/blog-static/2013/10/why-microsoft-word-must-die.html). 
-The ones I like involve writing an article in [markdown](http://daringfireball.net/projects/markdown/) format, integrating all data preparation, analysis, and outputs with the document (e.g. with the excellent and accessible [knitr](http://yihui.name/knitr/) package or with a custom `make` set up [like this one](https://github.com/mbjoseph/project-template)). 
-Add in version control with [Git](http://git-scm.com/), and you've got a nice stew going. 
+Many tools are now available to break free from [the tyranny of Word](http://www.antipope.org/charlie/blog-static/2013/10/why-microsoft-word-must-die.html).
+The ones I like involve writing an article in [markdown](http://daringfireball.net/projects/markdown/) format, integrating all data preparation, analysis, and outputs with the document (e.g. with the excellent and accessible [knitr](http://yihui.name/knitr/) package or with a custom `make` set up [like this one](https://github.com/mbjoseph/project-template)).
+Add in version control with [Git](http://git-scm.com/), and you've got a nice stew going.
 
-If you're involved in the open source/reproducible research blogo-twittersphere, this is probably old hat. 
+If you're involved in the open source/reproducible research blogo-twittersphere, this is probably old hat.
 To many in my department, this looks like black magic.
-It's not. 
+It's not.
 
 I can't give an authoritative overview, but here are some resources that helped me get through my divorce:
 
