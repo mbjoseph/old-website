@@ -1,0 +1,103 @@
+---
+layout: post
+title: "Split violin plots"
+date: 2013-06-24 15:02
+permalink: /blog/:year/:month/:day/:title/
+comments: true
+categories:
+---
+Violin plots are useful for comparing distributions. When data are 
+grouped by a factor with two levels (e.g. males and females), you can 
+split the violins in half to see the difference between groups. Consider 
+a 2 x 2 factorial experiment: treatments A and B are crossed with groups 
+1 and 2, with N=1000. 
+
+{% highlight r %}
+# Simulate data
+n.each <- 1000
+A1 <- rnorm(n.each, 2, 1)
+A2 <- rnorm(n.each, 1.5, 2)
+B1 <- rnorm(n.each, 4, 1.5)
+B2 <- rnorm(n.each, 0, 1)
+values <- c(A1, A2, B1, B2)
+treatment <- rep(c("A", "B"), each=n.each*2)
+group <- rep(c(1, 2, 1, 2), each=n.each)
+{% endhighlight %}
+
+Boxplots are often used:
+
+{% highlight r %}
+par(bty="n")
+boxplot(values ~ group*treatment, main="Box plot", col=rep(c("purple", "lightblue"), 2))
+{% endhighlight %}
+
+![](/images/boxplot.png)
+
+This gives us a rough comparison of the distribution in each group, 
+but sometimes it's nice to visualize the kernel density estimates instead. 
+
+I recently ran into this issue and tweaked the vioplot() function from 
+the [vioplot](http://cran.r-project.org/web/packages/vioplot/index.html) 
+package by Daniel Adler to make split violin plots. 
+With [vioplot2()](https://gist.github.com/mbjoseph/5852613), the `side` 
+argument specifies whether to plot the density on "both", the "left", or 
+the "right" side. 
+
+{% highlight r %}
+require(vioplot)
+require(devtools)
+require(digest)
+source_gist("https://gist.github.com/mbjoseph/5852613")
+plot(x=NULL, y=NULL, 
+     xlim = c(0.5, 2.5), ylim=c(min(values), max(values)),
+     type="n", ann=FALSE, axes=F)
+axis(1, at=c(1, 2),  labels=c("A", "B"))
+axis(2)
+for (i in unique(treatment)) {
+  for (j in unique(group)){
+    vioplot2(values[which(treatment == i & group == j)],
+             at = ifelse(i == "A", 1, 2),
+             side = ifelse(j == 1, "left", "right"),
+             col = ifelse(j == 1, "purple", "lightblue"),
+             add = T)
+  }
+}
+title("Violin plot", xlab="Treatment")
+legend("bottomright", fill = c("purple", "lightblue"),
+       legend = c("Group 1", "Group 2"), box.lty=0)
+
+{% endhighlight %}
+
+![](/images/violinplot.png)
+
+Last but not least, Peter Kampstra's 
+[beanplot](http://cran.r-project.org/web/packages/beanplot/index.html) 
+package uses beanplot() to make split 
+density plots, but 1) plots a rug rather 
+than a quantile box, 2) includes a line for the overall mean or median, 
+and 3) makes it easier to change the kernel function. 
+
+{% highlight r %}
+require(beanplot)
+beanplot(values ~ group*treatment, ll = 0.04,
+         main = "Bean plot", side = "both", xlab="Treatment",
+         col = list("purple", c("lightblue", "black")), 
+         axes=F)
+axis(1, at=c(1, 2),  labels=c("A", "B"))
+axis(2)
+legend("bottomright", fill = c("purple", "lightblue"),
+       legend = c("Group 1", "Group 2"), box.lty=0)
+{% endhighlight %}
+
+![](/images/beanplot.png)
+
+There are 
+[more](http://thebiobucket.blogspot.com/2011/08/comparing-two-distributions.html) 
+[ways](http://www.nicebread.de/comparing-all-quantiles-of-two-distributions-simultaneously/) 
+[than](http://flowingdata.com/2012/05/15/how-to-visualize-and-compare-distributions/) 
+[one](http://heuristically.wordpress.com/2012/06/13/comparing-continuous-distributions-with-r/) 
+[to](http://www.stats4stem.org/r-dotplots-and-stripcharts.html) 
+[skin](http://influentialpoints.com/Critiques/displaying_distributions_using_R.htm) 
+[a](http://blog.earlh.com/index.php/2009/07/visualizing-and-comparing-distributions-part-8-of-a-series/) 
+[cat](http://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Spielendes_K%C3%A4tzchen.JPG/640px-Spielendes_K%C3%A4tzchen.JPG), 
+and what one uses will probably come to personal preference.

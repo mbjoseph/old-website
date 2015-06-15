@@ -1,0 +1,189 @@
+---
+layout: post
+title: "Dynamic occupancy models in Stan"
+date: 2014-11-14 07:36
+permalink: /blog/:year/:month/:day/:title/
+comments: true
+categories:
+---
+
+Occupancy modeling is possible in Stan [as shown here](https://groups.google.com/forum/#!topic/stan-users/ZuLmNl4Q9xc), despite the lack of support for integer parameters.
+In many Bayesian applications of occupancy modeling, the true occupancy states (0 or 1) are directly modeled, but this can be avoided by marginalizing out the true occupancy state.
+The Stan [manual](http://mc-stan.org/manual.html) (pg. 96) gives an example of this kind of marginalization for a discrete change-point model.
+
+Here's a Stan implementation of a dynamic (multi-year) occupancy model of the sort described by MacKenzie et al. (2003).
+
+First, the model statement:
+
+{% highlight c %}
+data {
+   int<lower=0> nsite;
+   int<lower=0> nyear;
+   int<lower=0> nrep;
+   int<lower=0,upper=1> Y[nsite,nyear,nrep];
+}
+parameters {
+   real<lower=0,upper=1> p;
+   real<lower=0,upper=1> gamma;
+   real<lower=0,upper=1> phi;
+   real<lower=0, upper=1> psi1;
+}
+transformed parameters {
+   matrix[nsite, nyear] psi;
+   for (r in 1:nsite){
+     for (t in 1:nyear){
+       if (t < 2){
+          psi[r, t] <- psi1;
+       } else {
+          psi[r, t] <- psi[r, t-1] * phi + (1 - psi[r, t-1]) * gamma;
+       }
+     }
+   }
+}
+model {
+   // priors
+  psi1 ~ uniform(0,1);
+  gamma ~ uniform(0,1);
+  phi ~ uniform(0,1);
+  p ~ uniform(0,1);
+
+   // likelihood
+  for (r in 1:nsite){
+    for (t in 1:nyear){
+      if (sum(Y[r, t]) > 0){
+        increment_log_prob(log(psi[r, t]) + bernoulli_log(Y[r, t], p));
+      } else {
+        increment_log_prob(log_sum_exp(log(psi[r, t]) + bernoulli_log(Y[r, t],p),
+                                      log(1-psi[r, t])));
+      }
+    }
+  }
+}
+
+{% endhighlight %}
+
+This model can be made faster by storing values for log(psi) and log(1 - psi), as done in [Bob Carpenter's single season example](https://groups.google.com/forum/#!topic/stan-users/ZuLmNl4Q9xc).
+
+Fitting the model (in parallel):
+
+{% highlight r %}
+library(rstan)
+library(parallel)
+
+simulate_data <- function(){
+  nsite <- 100;
+  nrep <- 2;     # repeat surveys
+  nyear <- 10;  # nyears
+  p <- 0.8;
+  gamma <- .2
+  phi <- .8
+  psi1 <- .8
+  psi <- array(dim=c(nsite, nyear))
+  psi[, 1] <- psi1
+  for (t in 2:nyear){
+    psi[, t] <- psi[, t - 1] * phi + (1 - psi[, t-1]) * gamma
+  }
+
+  Z <- array(dim=c(nsite, nyear))
+  for (t in 1:nyear){
+    Z[, t] <- rbinom(nsite, 1, psi[, t])
+  }
+
+  Y <- array(dim=c(nsite, nyear, nrep))
+  for (r in 1:nsite){
+    for (t in 1:nyear){
+      Y[r, t, ] <- rbinom(nrep, 1, Z[r, t] * p)
+    }
+  }
+  return(list(nsite=nsite, nrep=nrep, nyear=nyear,
+              p=p, gamma=gamma, phi=phi,
+              psi1=psi1, Y=Y))
+}
+
+## parallel run
+d <- simulate_data()
+# initialize model
+mod <- stan("dyn_occ.stan", data = d, chains = 0)
+
+estimate_params <- function(model, data, iter=2000){
+  sflist <- mclapply(1:4, mc.cores = 4,
+             function(i) stan(fit = model, data = data,
+                              chains = 1, chain_id = i,
+                              iter=iter,
+                              refresh = -1))
+  fit <- sflist2stanfit(sflist)
+  return(fit)
+}
+
+fit <- estimate_params(model=mod, data=d)
+{% endhighlight %}
+
+Does it work? Let's whip up 1000 simulated datasets and their corresponding estimates for colonization and extinction rates.
+
+{% highlight r %}
+one_run <- function(initialized_mod, params){
+  require(modeest)
+  require(reshape2)
+  source("HDI.R")
+  d <- simulate_data()
+  fit <- estimate_params(model=initialized_mod, data=d)
+  # store HDI for certain params
+  post <- extract(fit, params)
+  vals <- array(dim=c(length(params), 3))
+  rownames(vals) <- params
+  colnames(vals) <- c("LCI", "mode", "UCI")
+  mode <- rep(NA, length(params))
+  lci <- rep(NA, length(params))
+  uci <- rep(NA, length(params))
+  for (i in 1:length(params)){
+    # calculate posterior mode
+    mode[i] <- mlv(post[[i]], method="mfv")$M
+    # calculate HDI
+    interv <- HDI(post[[i]])
+    lci[i] <- interv[1]
+    uci[i] <- interv[2]
+  }
+  vals <- data.frame(parameter = params, mode=mode,
+                     lci=lci, uci=uci)
+  return(vals)
+}
+
+iterations <- 1000
+check <- one_run(mod, c("gamma", "phi"))
+check$iteration <- rep(1, nrow(check))
+for (i in 2:iterations){
+  new_d <- one_run(mod, c("gamma", "phi"))
+  new_d$iteration <- rep(i, nrow(new_d))
+  check <- rbind(check, new_d)
+}
+
+true.vals <- data.frame(parameter = c("gamma", "phi"),
+                        value = c(d$gamma, d$phi))
+post.vals <- data.frame(parameter = c("gamma", "phi"),
+                        value = c(mean(check$mode[check$parameter == "gamma"]),
+                                  mean(check$mode[check$parameter == "phi"])))
+
+ggplot(check) +
+  geom_point(aes(x=mode, y=iteration)) +
+  facet_wrap(~parameter) +
+  geom_segment(aes(x=lci, xend=uci,
+                   y=iteration, yend=iteration)) +
+  theme_bw() +
+  geom_vline(aes(xintercept=value), true.vals,
+             color="blue", linetype="dashed") +
+  geom_vline(aes(xintercept=value), post.vals,
+             color="red", linetype="dashed") +
+  xlab("value")
+{% endhighlight %}
+
+![](/images/stan_occ.svg)
+
+Here are the results for the probability of colonization $\gamma$, and the probability of persistence $\phi$.
+The blue dashed line shows the true value, and the dashed red lines shows the mean of all 1000 posterior modes.
+The black lines represent the HPDI for each interation, and the black points represent the posterior modes.
+This example uses a uniform prior on both of these parameters - probably an overrepresentation of prior ignorance in most real systems.
+
+Based on some initial exploration, this approach seems much much (much?) faster than explicitly modeling the latent occurrence states in JAGS, with better chain mixing and considerably less autocorrelation. Extension to multi-species models should be straightforward too.
+
+### References
+MacKenzie DI, Nichols JD, Hines JE, Knutson MG, Franklin AB. 2003. Estimating site occupancy, colonization, and local extinction when a species is detected imperfectly. Ecology 84(8): 2200-2207. [pdf](http://www.umesc.usgs.gov/documents/publications/2003/mackenzie_a_estimatiang_site_2003.pdf)

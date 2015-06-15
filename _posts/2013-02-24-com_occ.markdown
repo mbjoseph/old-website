@@ -1,0 +1,243 @@
+---
+layout: post
+title: "Dynamic community occupancy modeling with R and JAGS"
+date: 2013-02-24 15:02
+comments: true
+permalink: /blog/:year/:month/:day/:title/
+categories: 
+---
+This post is intended to provide a simple example of how to construct and make inferences on a multi-species multi-year occupancy model using R, JAGS, and the ‘rjags’ package. This is not intended to be a standalone tutorial on dynamic community occupancy modeling. Useful primary literature references include MacKenzie et al. (2002), Kery and Royle (2007), Royle and Kery (2007), Russell et al. (2009), and Dorazio et al. (2010). Royle and Dorazio’s Heirarchichal Modeling and Inference in Ecology also provides a clear explanation of simple one species occupancy models, multispecies occupancy models, and dynamic (multiyear) occupancy models, among other things. There’s also a wealth of code provided [here](https://sites.google.com/site/communitymodeling/) by Elise Zipkin, J. Andrew Royle, and others.
+
+Before getting started, we can define two convenience functions:
+
+{% highlight r %}
+logit <- function(x) {
+    log(x/(1 - x))
+}
+
+antilogit <- function(x) {
+    exp(x)/(1 + exp(x))
+}
+{% endhighlight %}
+
+Then, initializing the number of sites, species, years, and repeat surveys (i.e. surveys within years, where the occupancy status of a site is assumed to be constant),
+
+{% highlight r %}
+nsite <- 150
+nspec <- 6
+nyear <- 4
+nrep <- 3
+{% endhighlight %}
+
+we can begin to consider occupancy. We’re interested in making inferences about the rates of colonization and population persistence for each species in a community, while estimating and accounting for imperfect detection.
+
+Occupancy status at site $j$, by species $i$, in year $t$ is represented by $z(j,i,t)$. For occupied sites $z=1$; for unoccupied sites $z=0$. However, $Z$ is incompletely observed: it is possible that a species $i$ is present at a site $j$ in some year $t$ ($z(j,i,t)=1$) but species $i$ was never seen at at site $j$ in year $t$ across all $k$ repeat surveys because of imperfect detection. These observations are represented by $x(j,i,t,k)$. Here we assume that there are no “false positive” observations. In other words, if $\sum_{1}^{k}x(j,i,t,k)>0$ , then $z(j,i,t)=1$. If a site is occupied, the probability that $x(j,i,t,k)=1$ is represented as a Bernoulli trial with probability of detection $p(j,i,t,k)$, such that
+
+$$
+x(j,i,t,k) \sim Bernoulli(z(j,i,t)p(j,i,t,k))
+$$
+
+The occupancy status $z$ of species $i$ at site $j$ in year $t$ is modeled as a Markov Bernoulli trial. In other words whether a species is present at a site in year $t$ is influenced by whether it was present at year $t−1$.
+$$
+z(j,i,t) \sim Bernoulli(ψj,i,t)
+$$
+
+where for $t>1$
+
+$$
+logit(\psi_{j,i,t})=\beta_i + \rho_i z(i, j, t-1)
+$$
+
+and in year one $(t=1)$
+
+$$
+logit(\psi_{j,i,1})=\beta_i + \rho_i z_0(i, j)
+$$
+
+where the occupancy status in year 0, $$z_0(i,j) \sim Bernoulli(\rho_{0i})$$, and $$\rho_{0i} \sim Uniform(0,1)$$. $$\beta_i$$ and $$\rho_i$$ are parameters that control the probabilities of colonization and persistence. If a site was unoccupied by species $$i$$ in a previous year $$z(i,j,t−1)=0$$, then the probability of colonization is given by the antilogit of $$\beta_i$$. If a site was previously occupied $$z(i,j,t−1)=1$$, the probability of population persistence is given by the anitlogit of $$\beta_i + \rho_i$$. We assume that the distributions of species specific parameters are defined by community level hyperparameters such that $$\beta_i \sim Norm(\mu_\beta, \sigma_\beta)$$ and $$rho_i \sim Norm(\mu_\rho, \sigma_\rho)$$. We can generate occupancy data as follows:
+
+{% highlight r %}
+# community level hyperparameters
+p_beta = 0.7
+mubeta <- logit(p_beta)
+sdbeta <- 2
+
+p_rho <- 0.8
+murho <- logit(p_rho)
+sdrho <- 1
+
+# species specific random effects
+set.seed(1)  # for reproducibility
+beta <- rnorm(nspec, mubeta, sdbeta)
+set.seed(1008)
+rho <- rnorm(nspec, murho, sdrho)
+
+# initial occupancy states
+set.seed(237)
+rho0 <- runif(nspec, 0, 1)
+z0 <- array(dim = c(nsite, nspec))
+for (i in 1:nspec) {
+    z0[, i] <- rbinom(nsite, 1, rho0[i])
+}
+
+# subsequent occupancy
+z <- array(dim = c(nsite, nspec, nyear))
+lpsi <- array(dim = c(nsite, nspec, nyear))
+psi <- array(dim = c(nsite, nspec, nyear))
+for (j in 1:nsite) {
+    for (i in 1:nspec) {
+        for (t in 1:nyear) {
+            if (t == 1) {
+                lpsi[j, i, t] <- beta[i] + rho[i] * z0[j, i]
+                psi[j, i, t] <- antilogit(lpsi[j, i, t])
+                z[j, i, t] <- rbinom(1, 1, psi[j, i, t])
+            } else {
+                lpsi[j, i, t] <- beta[i] + rho[i] * z[j, i, t - 1]
+                psi[j, i, t] <- antilogit(lpsi[j, i, t])
+                z[j, i, t] <- rbinom(1, 1, psi[j, i, t])
+            }
+        }
+    }
+}
+{% endhighlight %}
+
+For simplicity, we’ll assume that there are no differences in species detectability among sites, years, or repeat surveys, but that detectability varies among species. We’ll again use hyperparameters to specify a distribution of detection probabilities in our community, such that $$logit(p_i) \sim Norm(\mu_p, \sigma_p)$$.
+
+{% highlight r %}
+p_p <- 0.7
+mup <- logit(p_p)
+sdp <- 1.5
+set.seed(222)
+lp <- rnorm(nspec, mup, sdp)
+p <- antilogit(lp)
+{% endhighlight %}
+
+We can now generate our observations based on occupancy states and detection probabilities. Although this could be vectorized for speed, let’s stick with nested for loops in the interest of clarity.
+
+{% highlight r %}
+x <- array(dim = c(nsite, nspec, nyear, nrep))
+for (j in 1:nsite) {
+    for (i in 1:nspec) {
+        for (t in 1:nyear) {
+            for (k in 1:nrep) {
+                x[j, i, t, k] <- rbinom(1, 1, p[i] * z[j, i, t])
+            }
+        }
+    }
+}
+{% endhighlight %}
+
+Now that we’ve collected some data, we can specify our model:
+
+{% highlight r %}
+cat("
+model{
+  #### priors
+  # beta hyperparameters
+  p_beta ~ dbeta(1, 1)
+	mubeta <- log(p_beta / (1 - p_beta))
+  sigmabeta ~ dunif(0, 10)
+  taubeta <- (1 / (sigmabeta * sigmabeta))
+
+  # rho hyperparameters
+  p_rho ~ dbeta(1, 1)
+	murho <- log(p_rho / (1 - p_rho))
+	sigmarho~dunif(0,10)
+	taurho<-1/(sigmarho*sigmarho)
+
+  # p hyperparameters
+  p_p ~ dbeta(1, 1)
+  mup <- log(p_p / (1 - p_p))
+  sigmap ~ dunif(0,10)
+  taup <- (1 / (sigmap * sigmap))
+
+  #### occupancy model
+  # species specific random effects
+  for (i in 1:(nspec)) {
+    rho0[i] ~ dbeta(1, 1)
+    beta[i] ~ dnorm(mubeta, taubeta)
+    rho[i] ~ dnorm(murho, taurho)
+  }
+  
+  # occupancy states
+  for (j in 1:nsite) {
+    for (i in 1:nspec) {
+      z0[j, i] ~ dbern(rho0[i])
+      logit(psi[j, i, 1]) <- beta[i] + rho[i] * z0[j, i] 
+      z[j, i, 1] ~ dbern(psi[j, i, 1]) 
+      for (t in 2:nyear) {
+        logit(psi[j, i, t]) <- beta[i] + rho[i] * z[j, i, t-1]
+        z[j, i, t] ~ dbern(psi[j, i, t])
+      }
+    }
+  }
+
+  #### detection model
+	for(i in 1:nspec){ 
+		lp[i] ~ dnorm(mup, taup)
+		p[i] <- (exp(lp[i])) / (1 + exp(lp[i]))
+	}
+	
+  #### observation model
+  for (j in 1:nsite){
+    for (i in 1:nspec){
+      for (t in 1:nyear){
+        mu[j, i, t] <- z[j, i, t] * p[i] 
+        for (k in 1:nrep){
+          x[j, i, t, k] ~ dbern(mu[j, i, t])
+        }
+      }
+    }
+  }
+}
+", fill=TRUE, file="com_occ.txt")
+{% endhighlight %}
+
+Next, bundle up the data.
+
+{% highlight r %}
+data <- list(x = x, nrep = nrep, nsite = nsite, nspec = nspec, nyear = nyear)
+{% endhighlight %}
+
+Provide initial values. 
+
+{% highlight r %}
+zinit <- array(dim = c(nsite, nspec, nyear))
+for (j in 1:nsite) {
+    for (i in 1:nspec) {
+        for (t in 1:nyear) {
+            zinit[j, i, t] <- max(x[j, i, t, ])
+        }
+    }
+}
+
+inits <- function() {
+    list(p_beta = runif(1, 0, 1), p_rho = runif(1, 0, 1), sigmarho = runif(1,
+        0, 1), sigmap = runif(1, 0, 10), sigmabeta = runif(1, 0, 10), z = zinit)
+}
+{% endhighlight %}
+
+As a side note, it is helpful in JAGS to provide initial values for the incompletely observed occupancy state $z$ that are consistent with observed presences, as provided in this example with `zinit`. In other words if $x(j,i,t,k)=1$, provide an intial value of 1 for $z(j,i,t)$. Unlike WinBUGS and OpenBUGS, if you do not do this, you’ll often (but not always) encounter an error message such as:
+
+{% highlight r %}
+# Error in jags.model(file = 'com_occ.txt', data = data, n.chains = 3) :
+# Error in node x[1,1,2,3] Observed node inconsistent with unobserved
+# parents at initialization
+{% endhighlight %}
+
+Now we’re ready to monitor and make inferences about some parameters of interest using JAGS.
+
+{% highlight r %}
+params <- c("lp", "beta", "rho")
+require(rjags)
+ocmod <- jags.model(file = "com_occ.txt", inits = inits, data = data, n.chains = 3)
+nburn <- 2000
+update(ocmod, n.iter = nburn)
+out <- coda.samples(ocmod, n.iter = 17000, variable.names = params)
+summary(out)
+plot(out)
+{% endhighlight %}
+
+![](http://www.colorado.edu/ebio/gradstudents/joseph/figure/unnamed-chunk-101.png)
+
+

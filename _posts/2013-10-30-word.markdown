@@ -1,0 +1,37 @@
+---
+layout: post
+title: "R and my divorce from Word"
+date: 2013-10-30 13:10
+permalink: /blog/:year/:month/:day/:title/
+comments: true
+categories: 
+---
+
+![](/images/axe-murderer.jpg)
+
+Being in grad school, I do a lot of scholarly writing that requires associated or embedded R analyses, figures, and tables, plus bibliographies. 
+
+Microsoft Word makes this unnecessarily difficult.
+
+Many tools are now available to break free from [the tyranny of Word](http://www.antipope.org/charlie/blog-static/2013/10/why-microsoft-word-must-die.html). 
+The ones I like involve writing an article in [markdown](http://daringfireball.net/projects/markdown/) format, integrating all data preparation, analysis, and outputs with the document (e.g. with the excellent and accessible [knitr](http://yihui.name/knitr/) package or with a custom `make` set up [like this one](https://github.com/mbjoseph/project-template)). 
+Add in version control with [Git](http://git-scm.com/), and you've got a nice stew going. 
+
+If you're involved in the open source/reproducible research blogo-twittersphere, this is probably old hat. 
+To many in my department, this looks like black magic.
+It's not. 
+
+I can't give an authoritative overview, but here are some resources that helped me get through my divorce:
+
+- [R Markdown](http://www.rstudio.com/ide/docs/authoring/using_markdown) = [knitr](http://yihui.name/knitr/) + [RStudio](http://www.rstudio.com/) may be one of the better places to start
+- [How to ditch Word](http://inundata.org/2012/12/04/how-to-ditch-word/) by [Karthik Ram](http://inundata.org/profile/)
+- [Markdown and the future of collaborative manuscript writing](http://inundata.org/2012/06/01/markdown-and-the-future-of-collaborative-manuscript-writing/) by [Karthik Ram](http://inundata.org/profile/)
+- [Git can facilitate greater reproducibility and increased transparency in science](http://www.scfbm.org/content/8/1/7/abstract) by [Karthik Ram](http://inundata.org/profile/)
+- [Version control for scientific research](http://blogs.biomedcentral.com/bmcblog/2013/02/28/version-control-for-scientific-research/) by [Karthik Ram](http://inundata.org/profile/) and [C. Titus Brown](http://ged.msu.edu/index.html)
+- [What is scholarly markdown?](http://blog.martinfenner.org/2013/06/17/what-is-scholarly-markdown/) by [Martin Fenner](http://blog.martinfenner.org/about.html)
+- [Markdown for scientific writing](https://github.com/karthikram/markdown_science) by [Martin Fenner](http://blog.martinfenner.org/about.html) and [Karthik Ram](http://inundata.org/profile/)
+- [Pandoc](http://johnmacfarlane.net/pandoc/index.html) to convert from markdown to almost any other format
+- [pandoc-citeproc](http://hackage.haskell.org/package/pandoc-citeproc) for citations
+- [Citations in markdown using knitr](http://carlboettiger.info/2012/03/24/citations-in-markdown-using-knitr.html) for another take on citations, from [Carl Boettiger](http://carlboettiger.info/)
+- [All you need is text – Markdown (via pandoc) for academia](http://www.surefoss.org/publishing-publizieren/all-you-need-is-text-markdown-via-pandoc-for-academia/) by [Gerrit Hirshfeld](http://scholar.google.com/citations?user=8aqzdtMAAAAJ&hl=en)
+- [Getting started with make](http://linux.omnipotent.net/article.php?article_id=7822)

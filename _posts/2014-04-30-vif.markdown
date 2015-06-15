@@ -1,0 +1,118 @@
+---
+layout: post
+title: "Shiny variance inflation factor sandbox"
+date: 2014-04-30 18:40
+permalink: /blog/:year/:month/:day/:title/
+comments: true
+categories: 
+---
+
+In multiple regression, strong correlations among covariates increases the uncertainty or variance in estimated regression coefficients. 
+Variance inflation factors (VIFs) are one tool that has been used as an indicator of problematic covariate collinearity. 
+In teaching students about VIFs, it may be useful to have some interactive supplementary material so that they can manipulate factors affecting the uncertainty in slope terms in real-time. 
+
+Here's a little [R shiny](http://www.rstudio.com/shiny/) app that could be used as a starting point for such a supplement. 
+Currently it only includes two covariates for simplicity, and gives the user control over the covariate $R^2$ value, the residual variance, and the variance of both covariates. 
+
+As usual, the file `server.R` defines what you want to actually do in R:
+
+{% highlight r %}
+# interactive variance inflation factor module
+library(shiny)
+library(car)
+library(mvtnorm)
+library(gridExtra)
+library(ggplot2)
+
+shinyServer(function(input, output){
+  output$plot <- renderPlot({
+    r2 <- input$r2
+    var_error <- input$resid_var
+    var_x1 <- input$var_x1
+    var_x2 <- input$var_x2
+    beta <- c(0, 1, 1)
+    
+    # users enter R^2, this backcalculates covariance
+    cov_x1x2 <- sqrt(var_x1 * var_x2 * r2)
+    sigma <- matrix(c(var_x1, cov_x1x2, 
+                      cov_x1x2, var_x2), 
+                    nrow=2)
+    
+    X <- array(1, dim=c(input$n, 3))
+    X[, c(2, 3)] <- rmvnorm(n=input$n, sigma=sigma, method="chol")
+    mu <- X %*% beta
+    epsilon <- rnorm(input$n, 0, sqrt(var_error))
+    y <- mu + epsilon
+    
+    X1 <- X[, 2]
+    X2 <- X[, 3]
+    
+    model <- lm(y ~ 1 + X1 + X2)
+
+    # thanks to Ben Bolker for the next 3 lines
+    # https://groups.google.com/forum/#!topic/ggplot2/4-l3dUT-h2I
+    l <- list(vif = round(vif(model)[1], digits=2))
+    eq <- substitute(italic(VIF) == vif, l)
+    eqstr <- as.character(as.expression(eq))
+
+    l2 <- list(vif = round(vif(model)[2], digits=2))
+    eq2 <- substitute(italic(VIF) == vif, l2)
+    eqstr2 <- as.character(as.expression(eq2))
+    
+    # plot 1: parameter recovery
+    df3 <- data.frame(truth = beta, 
+                      lci = confint(model)[, 1], 
+                      uci = confint(model)[, 2], 
+                      est = coef(model), y=0:(length(beta) - 1))
+    
+    cip <- ggplot(df3, aes(x=truth, y=y)) + 
+      geom_point(col="blue", size=5, alpha=.5) + 
+      theme_bw() + 
+      geom_segment(aes(x=lci, y=y, xend=uci, yend=y)) + 
+      geom_point(aes(x=est, y=y), size=3, pch=1) + 
+      ggtitle("Coefficient recovery") + 
+      xlab("Value") + 
+      ylab(expression(beta)) + 
+      scale_y_continuous(breaks = c(0, 1, 2)) + 
+      theme(axis.title.y = element_text(angle = 0, hjust = 0))  + 
+      annotate(geom="text", x=0, y=2, label=eqstr, 
+               parse=TRUE, vjust=1.5, hjust=-1) + 
+      annotate(geom="text", x=0, y=1, label=eqstr2, 
+               parse=TRUE, vjust=1.5, hjust=-1)
+    
+    # plot 2: X1 & X2 correlation plot
+    xcorp <- ggplot(data.frame(X1, X2), aes(x=X1, y=X2)) + 
+      geom_point(pch=1) +
+      theme_bw() + 
+      ggtitle("Covariate scatterplot")
+    
+    grid.arrange(cip, xcorp, 
+                 ncol=2)
+    
+  })
+})
+{% endhighlight %}
+
+The file `ui.R` defines the user interface:
+
+{% highlight r %}
+library(shiny)
+
+shinyUI(pageWithSidebar(
+  headerPanel("Variance inflation factor sandbox"), 
+  sidebarPanel(
+    sliderInput("r2", "Covariate R-squared:", 
+                min=0, max=.99, value=0),
+    sliderInput("resid_var", "Residual variance:", 
+                min=1, max=10, value=1), 
+    sliderInput("var_x1", "Variance of X1:", 
+                min=1, max=10, value=1),
+    sliderInput("var_x2", "Variance of X2:", 
+                min=1, max=10, value=1)
+    ),
+  mainPanel(plotOutput("plot")
+            )
+  ))
+{% endhighlight %}
+
+Everything's ready to fork or clone on [Github](https://github.com/mbjoseph/vif).

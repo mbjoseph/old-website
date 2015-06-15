@@ -1,0 +1,237 @@
+---
+layout: post
+title: "Modeling habitat diversity and species richness"
+date: 2013-04-20 15:02
+permalink: /blog/:year/:month/:day/:title/
+comments: true
+categories: 
+---
+
+How does habitat diversity affect species richness? Perhaps intuition suggests that habitat diversity increases species richness by facilitating niche or resource partitioning among species. But, for a fixed area, as habitat heterogeneity increases, the area that can be allocated to each habitat type decreases. In a recent paper, [Allouche and colleagues (2012)](http://www.pnas.org/content/109/43/17495.abstract) provide a theoretical and empirical treatment of the habitat area-heterogeneity trade-off’s consequences for species richness. Both treatments of the subject indicated that the relationship between habitat heterogeneity and species richness may be unimodal, rather than strictly increasing. 
+
+![](/images/heterogeneity_richness.png)
+
+Conceptually, this is expected to occur when on the left side of the curve, increasing habitat heterogeneity opens up new regions in niche space, facilitating colonization by new species. However, as heterogeneity continues to increase, each species has fewer habitat patches to utilize, population sizes decrease, and local extinction risk increases due to demographic stochasticity. To explore this idea theoretically, Allouche et al. (2012) developed an individually based model using a continuous time Markov process. The details of their modeling approach can be found in the [supplement](http://www.pnas.org/content/suppl/2012/10/04/1208652109.DCSupplemental/sapp.pdf) to their [article](http://www.pnas.org/content/109/43/17495), which I recommend. In this post, I’ll demonstrate how to implement a discrete time version of their model in R. Thanks to the agent-based modeling working group at the University of Colorado for providing motivation to code up model in R.
+
+### Model structure ###
+
+This model is spatially implicit, with $A$ equally connected sites. Each site falls on an environmental condition axis, receiving some value $E$ that characterizes local conditions. The environmental conditions for each site are uniformly distributed between two values that dictate the range of environmental conditions in a focal area. The local range of environmental conditions is a subset of some global range. There are $N$ species in the regional pool that can colonize habitat patches. Each species has some environmental optimum $\mu_i$, and some niche width $\sigma_i$, which together define a Gaussian function for the probability of establishment given a colonization attempt and a habitat patch environmental condition $E$.
+
+![](/images/niches.png)
+
+The image above illustrates the probability of establishing for five species across the global range of environmental conditions possible. For any focal area, the realized range of environmental conditions is some subset of this global range.
+
+It is assumed that all individuals that occupy a patch have the same per-timestep probabilities of death and reproduction. If an individual reproduces, the number of offspring it produces is a Poisson distributed random variable, and each individual offspring attempts to colonize one randomly selected site. At each time-step, every site has an equal probability of a colonization attempt by an individual from each species in the regional pool. Every habitat patch holds only one individual.
+
+Offspring and immigrants from the regional pool do not displace individuals from habitat patches when they attempt to colonize. In empty sites, offspring receive colonization priority, with regional colonization occurring after breeding. When multiple offspring or immigrants from the regional pool could establish in an empty site, one successful individual is randomly chosen to establish regardless of species identity. 
+
+### Parameters ###
+The following parameters are supplied to the function `alloucheIBM()`:
+
+`A` = number of sites; `N` = number of species in the regional pool; `ERmin` = global environmental conditions minimum; `ERmax` = global environmental conditions maximum; `Emin` = local environmental minimum; `Emax` = local environmental maximum; `sig` = niche width standard deviation for all species; `pM` = per timestep probability of mortality; `pR` = per timestep probability of reproduction; `R` = per capita expected number of offspring; and `I` = per timestep probability of attempted colonization by an immigrant from the regional pool for each patch.
+
+### Implementation in R ###
+The function `alloucheIBM()` does the majority of work for this model:
+
+{% highlight r %}
+alloucheIBM <- function(A=100, N=100, ERmin=-30, ERmax=30, Emin=-30, Emax=30,
+                    sig=5, timesteps=1000, pM=.1, pR=1, R=2, I=0.1){
+  E <- runif(A, Emin, Emax) # habitat patch environment type
+  mu.i <- runif(N, ERmin, ERmax) # optimum environment
+  sigma <- rep(sig, N) # niche width
+  Z <- array(dim=c(N)) # normalization constant
+
+  # Z ensures all species have equal Pr(establishment) in regional pool
+  for (i in 1:N){
+    integrand <- function(E) {
+      exp(-((E - mu.i[i]) ^ 2) / (2 * sigma[i] ^ 2))
+    }
+    res <- integrate(integrand, lower=ERmin, upper=ERmax)
+    Z[i] <- 1 / res$value
+  }
+
+  # probability of establishment|colonization attempt
+  Pcol <- array(dim=c(A, N))
+  for (i in 1:A){
+    for (j in 1:N){
+      Pcol[i, j] <- Z[j] * exp(-((E[i] - mu.i[j]) ^ 2) / (2*sigma[j] ^ 2))
+    }
+  }
+
+  # store niche data
+  species <- rep(1:N, each=A)
+  E <- rep(E, N)
+  Pr.estab <- c(Pcol)
+  niche.d <- data.frame(species, E, Pr.estab)
+  niche.d <- niche.d[with(niche.d, order(species, E)),]
+
+  # initialize output
+  state <- array(0, dim=c(timesteps, A, N))
+  richness <- rep(NA, timesteps)
+  richness[1] <- 0
+  p.occ <- rep(NA, timesteps)
+  p.occ[1] <- 0
+
+  for (t in 2:timesteps){
+    state[t,,] <- state[t-1,,]
+
+    ## DEATHS ##
+    deaths <- array(rbinom(A*N, 1, c(state[t,,])*pM), dim=c(A, N))
+    state[t,,] <- state[t,,] - deaths
+
+    ## BIRTHS ##
+    pot.fecundity <- array(rpois(A * N, lambda = c(state[t,,] * R)), dim=c(A, N))
+    repro <- array(rbinom(A*N, 1, pR), dim=c(A, N))
+    fecundity <- repro * pot.fecundity
+    sum.fec <- apply(fecundity, 2, sum) # number of offspring per species
+
+    ## OFFSPRING COLONIZE ##
+    occupancy <- apply(state[t,,], 1, max)
+    if (sum(occupancy) < A & sum(sum.fec) > 0){ # if empty sites & new offspring
+      empty.sites <- which(occupancy == 0)
+      occ.sites <- which(occupancy == 1)
+      # randomly assign sites (empty & filled) to each offspring individual
+      col.sites <- sample(1:A, sum(sum.fec), replace=T)
+      col.spec <- rep(1:N, times=sum.fec) # how many of each species colonizing
+      colonizing.offspring <- array(0, dim=c(A, N))
+      for(i in 1:length(col.sites)){
+        colonizing.offspring[col.sites[i], col.spec[i]] <-
+          colonizing.offspring[col.sites[i], col.spec[i]] + 1
+      }
+      # offspring attempting to colonize occupied sites fail to displace
+      colonizing.offspring[occ.sites,] <- 0
+
+      # which colonizing offspring can actually establish?
+      binom.mat <- ifelse(colonizing.offspring > 0, 1, 0)
+      colonists <- array(rbinom(n = A * N,
+                                size = c(colonizing.offspring),
+                                prob = c(binom.mat * Pcol)),
+                         dim=c(A, N))
+
+      # are there colonization conflicts (> 1 individual trying to colonize each site?)
+      attempting <- apply(colonists, 1, sum)
+      if (any(attempting > 1)){
+        # resolve colonization conflicts
+        conflicts <- which(attempting > 1) # which sites have conflicts
+        for (k in conflicts){ # for each conflict
+          # how many indiv's of each spp attempting to simultaneously colonize?
+          n.attempting <- rep(1:N, times = colonists[k,])
+          # randomly select one successful from those attempting
+          successful <- sample(n.attempting, size=1)
+          new.row <- rep(0, length.out=N)
+          new.row[successful] <- 1
+          colonists[k,] <- new.row # individual becomes the only colonist
+        }
+      }
+      # add successful colonists
+      state[t,,] <- state[t,,] + colonists
+    }
+
+    ## IMMIGRANTS COLONIZE ##
+    occupancy <- apply(state[t,,], 1, max)
+    if(sum(occupancy) < A){
+      empty.sites <- which(occupancy == 0)
+      # which species immigrate to each site?
+      immigration <- array(rbinom(length(empty.sites)*N,
+                                  1, I), dim=c(length(empty.sites), N))
+      # which immigrants establish?
+      Pest <- immigration * Pcol[empty.sites, ]
+      establishment <- array(rbinom(length(Pest), 1, c(Pest)),
+                             dim=c(length(empty.sites), N))
+
+      # resolve conflicts arising from simultaneous colonization
+      col.attempts <- apply(establishment, 1, sum)
+      if (any(col.attempts > 1)){ # if individuals are trying to simultaneously colonize
+        conflicts <- which(col.attempts > 1) # which empty sites have conflicts
+        for (k in conflicts){ # for each conflict
+          # how many of individuals of each species are attempting to simultaneously colonize?
+          attempting <- rep(1:N, times = establishment[k,])
+          # successful individual randomly selected from those attempting
+          successful <- sample(attempting, size=1)
+          new.row <- rep(0, length.out=N)
+          new.row[successful] <- 1
+          establishment[k,] <- new.row
+        }
+      }
+      # add successful immigrants
+      state[t, empty.sites, ] <- state[t, empty.sites,] + establishment
+    }
+    richness[t] <- sum(apply(state[t,,], 2, max))
+    p.occ[t] <- length(which(state[t,,] == 1)) / A
+  }
+  return(list(richness=richness, p.occ = p.occ, state=state, niche.d=niche.d))
+}
+{% endhighlight %}
+
+The function returns a list containing a vector of species richness at each timestep, the proportion of sites occupied at each timestep, a state array containing all occupancy information for each patch, species, and timestep, and lastly a dataframe containing information on the niches of each species in the regional pool.
+
+Using this function we can begin to explore the dynamics of the model through time:
+
+{% highlight r %}
+out <- alloucheIBM(pM=.1, Emin=-30, Emax=30, sig=8, R=8, N=100, A=300, I=.01, timesteps=1000)
+plot(out$richness, type="l", xlab="Timestep", ylab="Species richness")
+{% endhighlight %}
+
+Repeating this process a few times, we reveal the expected species richness and it’s variance for some set of parameters.
+
+![](/images/richness_trajectory.png)
+
+Finally, we can address the issue of habitat heterogeneity and its effect on species richness. There are many ways to approach this issue, and many parameter combinations to consider. Allouche et al. (2012) provides a thorough treatment of the subject; I’ll demonstrate just one result: that under certain conditions, species richness peaks at intermediate levels of habitat heterogeneity.
+
+To construct a range of habitat heterogeneity values, let’s construct an interval and take subsequently narrower intervals centered around the middle of the original interval.
+
+{% highlight r %}
+ERmin <- -50
+ERmax <- 50
+global.median <- median(c(ERmin, ERmax))
+n.intervals <- 30
+lower.limits <- seq(ERmin, global.median-.5, length.out=n.intervals)
+upper.limits <- seq(ERmax, global.median, length.out=n.intervals)
+hab.het <- upper.limits - lower.limits # habitat heterogeneity
+{% endhighlight %}
+
+Here are the intervals:
+
+![](/images/envhet.png)
+
+Now, for each interval, we can iteratively run the model and track species richness. Because species richness tends to vary through time, let’s take the mean of the final 100 timesteps as a measure of species richness for each model run, and record the standard deviation to track variability. 
+
+{% highlight r %}
+n.iter <- 3 # number of iterations per interval
+sd.rich <- array(NA, dim=c(n.intervals, n.iter))
+end.rich <- array(NA, dim=c(n.intervals, n.iter))
+for (i in 1:n.intervals){
+  for (iter in 1:n.iter){
+    Emin <- lower.limits[i]
+    Emax <- upper.limits[i]
+    out <- alloucheIBM(pM=.9, Emin=Emin, Emax=Emax, sig=10, pR=1, R=1,
+                   N=100, A=100, I=.9, timesteps=300)
+    timesteps <- length(out$richness)
+    end.rich[i, iter] <- mean(out$richness[timesteps-100:timesteps])
+    sd.rich[i, iter] <- sd(out$richness[timesteps-100:timesteps])
+  }
+}
+
+end.richness <- c(t(end.rich))
+end.sd <- c(t(sd.rich))
+interval <- rep(hab.het, each=n.iter)
+plot.d <- data.frame(interval, end.richness, end.sd)
+
+# visualize the results
+require(ggplot2)
+range <- aes(ymax=end.richness + end.sd, ymin=end.richness - end.sd)
+ggplot(plot.d, aes(x=interval, y=end.richness)) +
+  geom_point(shape=1, size=2) + geom_errorbar(range) +
+  theme_classic() +
+  xlab("Habitat heterogeneity") + ylab("Species richness")
+{% endhighlight %}
+
+![](/images/final.svg)
+
+Of course, the shape of this relationship is sensitive to the parameters. As an example, changing niche width to increase or decrease niche overlap will mediate the strength of interspecific competition for space. Also, increasing reproductive rates may buffer each species from stochastic extinction so that the relationship between environmental heterogeneity and richness is monotonically increasing. Furthermore, here I centered all intervals around the same value, but the exact position of the environmental heterogeneity interval will affect the net establishment probability for each site, depending on how the interval relates to species niches. The parameter space is yours to explore.
+
+These types of stochastic simulation models are fairly straightforward to implement in R. Indeed there’s a package dedicated to facilitating the implementation of such models: [simecol](http://simecol.r-forge.r-project.org/). There’s even a book: [A Practical Guide to Ecological Modelling: Using R as a Simulation Platform](http://books.google.com/books/about/A_Practical_Guide_to_Ecological_Modellin.html?id=aVjDtSmJqhAC).
+
+### Full reference ###
+
+Allouche O, Kalyuzhny M, Moreno-Rueda G, Pizarro M, & Kadmon R. (2012) Area-heterogeneity tradeoff and the diversity of ecological communities. Proceedings of the National Academy of Sciences of the United States of America, 109 (43): 17495-17500.
