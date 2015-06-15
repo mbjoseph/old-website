@@ -1,0 +1,51 @@
+---
+layout: post
+title: "Plotting spatial neighbors in ggmap"
+date: 2015-06-15 14:00
+comments: true
+categories:
+---
+
+The R package [spdep](http://cran.r-project.org/web/packages/spdep/index.html) has great utilities to define spatial neighbors (e.g. `dnearneigh`, `knearneigh`, with a nice [vignette](http://cran.r-project.org/web/packages/spdep/vignettes/nb.pdf) to boot), but the plotting functionality is aimed at base graphics.
+If you're hoping to plot spatial neighborhoods as line segments in [ggplot2](http://ggplot2.org/), or [ggmap](http://cran.r-project.org/web/packages/ggmap/index.html), you'll need the neighborhood data to be stored in a data frame.
+So, to save others some trouble, I thought I'd share a little function that converts a spatial neighbors object (of class `nb`) to a data frame.
+This function is largely an alteration of the existing plotting function for base graphics, [plot.nb](https://github.com/cran/spweights/blob/master/R/plot.nb.R).
+
+{% highlight r%}
+library(spdep)
+data(nc.sids)
+
+# function converts nb object to a data.frame
+nb_to_df <- function(nb, coords){
+  x <- coords[, 1]
+  y <- coords[, 2]
+  n <- length(nb)
+
+  cardnb <- card(nb)
+  i <- rep(1:n, cardnb)
+  j <- unlist(nb)
+  return(data.frame(x=x[i], xend=x[j],
+                    y=y[i], yend=y[j]))
+  }
+
+  # create distance-based neighbors
+  sids_nb <- dnearneigh(sidscents, d1=0, d2=80, longlat=T)
+  nb_df <- nb_to_df(sids_nb, sidscents)
+
+  # create data frame of coordinates
+  coord_df <- data.frame(sidscents)
+  names(coord_df) <- c("lon", "lat")
+
+  # plot results with ggmap
+  library(ggmap)
+  basemap <- get_map("North Carolina", zoom=6)
+
+  ggmap(basemap) +
+    geom_segment(aes(x=x, xend=xend, y=y, yend=yend),
+    data=nb_df) +
+    geom_point(aes(x=lon, y=lat), data=coord_df) +
+    ylab("Latitude") +
+    xlab("Longitude")
+{% endhighlight %}
+
+![](/images/map.png)
