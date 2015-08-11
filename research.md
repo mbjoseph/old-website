@@ -27,7 +27,7 @@ Amphibians face many threats worldwide, even in protected wilderness areas and n
 
 ### Peer-reviewed publications
 
-- Mihaljevic JR, Joseph MB, Johnson PTJ. In press. Using multi-species occupancy models to improve the characterization and understanding of metacommunity structure. Ecology. [link](http://www.esajournals.org/doi/abs/10.1890/14-1580.1)
+- Mihaljevic JR, Joseph MB, Johnson PTJ. 2015. Using multi-species occupancy models to improve the characterization and understanding of metacommunity structure. Ecology 96(7): 1783–1792. [link](http://www.esajournals.org/doi/abs/10.1890/14-1580.1)
 
 - Mihaljevic JR, Joseph MB, Orlofske SA, Paull SH. 2014. The scaling of host density with richness affects the direction, shape, and detectability of diversity-disease relationships. PLoS ONE 9(5): e97812. [link](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0097812)
 
