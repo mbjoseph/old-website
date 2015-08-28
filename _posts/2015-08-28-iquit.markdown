@@ -1,0 +1,153 @@
+---
+layout: post
+title: "The IQUIT R video series"
+date: 2015-08-28 14:00
+comments: true
+categories: R
+---
+
+For many undergraduates in biology, programming is a [threshold concept](https://books.google.com/books?hl=en&lr=&id=RCUVmm05qmcC&oi=fnd&pg=PP1&ots=SSn68PiCkk&sig=oGSCNE3ALZCleytv4LWN5jYpQII#v=onepage&q&f=false), which can serve as a gateway into other threshold concepts in statistics like sampling and null hypothesis testing.
+So, getting students over the programming hump is a major priority.
+I've uploaded 20+ R tutorials to YouTube for a new undergraduate course in the EBIO department at CU developed by [Andrew Martin](http://stripe.colorado.edu/~am/Site/Martin_Lab.html) and [Brett Melbourne](http://www.colorado.edu/eeb/facultysites/melbourne/), which in jocular anticipation was named IQUIT: an introduction to quantitative inference and thinking.
+
+We made the videos to address the most common R programming problems that arose for students in the first iteration of the course.
+These short tutorials may be of use elsewhere:
+
+[Introduction to R](https://youtu.be/TG77MVHfC8E?list=PLo1ryuEXQ0sfGqV7MMwF9SiOuxW9hjZuc)
+
+- everything is an object
+- addition, subtraction, multiplication
+- assignment
+
+[Numeric vectors: 1](https://youtu.be/A2Sh7uBwQv0?list=PLo1ryuEXQ0sfGqV7MMwF9SiOuxW9hjZuc)
+
+- vectors vs. scalars
+- create vectors with `c()`
+
+[Numeric vectors: 2](https://youtu.be/lNZQnLu_AWM?list=PLo1ryuEXQ0sfGqV7MMwF9SiOuxW9hjZuc)
+
+- how to explore the structure of a vector
+- `class`, `length`, `str`
+
+[Functions in R](https://youtu.be/wM9Wy8fuhXY?list=PLo1ryuEXQ0sfGqV7MMwF9SiOuxW9hjZuc)
+
+- input and output
+- single argument functions: `sqrt`, `log`, `exp`
+- multi-argument functions: `round`
+
+[Creating special vectors: sequences and repetition](https://youtu.be/QvLwX1LKHDY?list=PLo1ryuEXQ0sfGqV7MMwF9SiOuxW9hjZuc)
+
+- generate integer sequence: `:`
+- create sequence `seq` (hit args)
+- repeat something `rep` (also note argument structure)
+
+[Relational operators and logical data types](https://youtu.be/sOQWm_jGwrg?list=PLo1ryuEXQ0sfGqV7MMwF9SiOuxW9hjZuc)
+
+- logical types (intro to relational operators)
+- `==`, `!=`, `>`, `<`, `>=`, `<=`
+- `TRUE` and `FALSE`
+
+[Character data](https://youtu.be/M9_-LiNa9kA?list=PLo1ryuEXQ0sfGqV7MMwF9SiOuxW9hjZuc)
+
+- character objects
+- character vectors
+- relational operators on character vectors
+
+[2-d data structures: matrices and data frames](https://youtu.be/EKIARVrBFm8?list=PLo1ryuEXQ0sfGqV7MMwF9SiOuxW9hjZuc)
+
+- data frames can hold lots of different data types
+- matrix elements must be of the same type
+
+[Intro to indexing: matrices and vectors](https://youtu.be/nnx8_2Ckt-g?list=PLo1ryuEXQ0sfGqV7MMwF9SiOuxW9hjZuc)
+
+- indexing and subsetting with `[`
+- review `str`
+- a bit with relational operators
+
+[Data frame subsetting and indexing](https://youtu.be/Tt4vYYCEzLY?list=PLo1ryuEXQ0sfGqV7MMwF9SiOuxW9hjZuc)
+
+- indexing with relational operators
+- 3 ways to subset data frame: `df[c("column names")], df$column, df[, 1]`
+
+[R style & other secrets to happiness](https://youtu.be/s9NuGG-icn4?list=PLo1ryuEXQ0sfGqV7MMwF9SiOuxW9hjZuc)
+
+- basics of R style: spacing, alignment,
+- breaking up run-on lines
+- workspace management
+- `ls`, `rm`
+- choosing good names for files and objects
+- commenting
+
+[Working with data in R: 1](https://youtu.be/76_WvFO5_bE?list=PLo1ryuEXQ0sfGqV7MMwF9SiOuxW9hjZuc)
+
+- reading in data with `read.csv`
+- automatic conversion of missing values to `NA`
+
+[Working with data in R: 2](https://youtu.be/uXMUJeR5mXk?list=PLo1ryuEXQ0sfGqV7MMwF9SiOuxW9hjZuc)
+
+- mixed type errors (numbers read in as characters because one cell has a letter)
+- search path errors
+- `is.na`
+
+[Visualization part 1: intro to plot()](https://youtu.be/tNpcjcHX__I?list=PLo1ryuEXQ0sfGqV7MMwF9SiOuxW9hjZuc)
+
+- `plot`
+- arguments: `xlab`, `ylab`, `col`
+
+[Visualization part 2: other types of plots](https://youtu.be/F5FOSPQhuL0?list=PLo1ryuEXQ0sfGqV7MMwF9SiOuxW9hjZuc)
+
+- histograms, jitter plots, line graphs
+
+[Visualization part 3: adding data to plots](https://youtu.be/J5YlRwklxSY?list=PLo1ryuEXQ0sfGqV7MMwF9SiOuxW9hjZuc)
+
+- adding `points`
+- adding `lines`, and `segments` (also `abline`)
+
+[Visualization part 4: annotation and legends](https://youtu.be/0bdduM8MpzE?list=PLo1ryuEXQ0sfGqV7MMwF9SiOuxW9hjZuc)
+
+- annotation via `text`
+- adding legends
+
+[Visualization part 5: graphical parameters](https://youtu.be/kIA04W7juTQ?list=PLo1ryuEXQ0sfGqV7MMwF9SiOuxW9hjZuc)
+
+- commonly used parameters
+- for points: `col`, `cex`, `pch` (see `?points` for `pch` options)
+- for lines: `col`, `lwd`, `lty`
+
+
+[Looping repetitive tasks](https://youtu.be/0_Bc0a6op-I?list=PLo1ryuEXQ0sfGqV7MMwF9SiOuxW9hjZuc)
+
+- the power of the `for` loop
+- creating objects to hold results ahead of time, rather than growing objects
+
+[Summarizing data](https://youtu.be/tHNcFs5G2fI?list=PLo1ryuEXQ0sfGqV7MMwF9SiOuxW9hjZuc)
+
+- `mean`, `sd`, `var`, `median`
+
+[Randomization & sampling distributions](https://youtu.be/lcw0Hqmoxvs?list=PLo1ryuEXQ0sfGqV7MMwF9SiOuxW9hjZuc)
+
+- `sample` and `rep`
+
+[Debugging R code 1: letting R find your data](https://youtu.be/u0Kttdxo0Ho?list=PLo1ryuEXQ0sfGqV7MMwF9SiOuxW9hjZuc)
+
+- working directory errors when reading in data
+- problems with typos, using objects that don't exist
+
+[Debugging R code 2: unreported errors](https://youtu.be/_87ijg5L4Rw?list=PLo1ryuEXQ0sfGqV7MMwF9SiOuxW9hjZuc)
+
+- errors do not always bring error messages
+- steps to finding & fixing errors
+
+[Replication and sample size](https://youtu.be/Xfdg0xqFjts?list=PLo1ryuEXQ0sfGqV7MMwF9SiOuxW9hjZuc)
+
+- explore the effect of `n` on the uncertainty in a sample mean
+
+[Conveying uncertainty with confidence intervals while not obscuring the data](https://youtu.be/x4ekQ1nanQ4?list=PLo1ryuEXQ0sfGqV7MMwF9SiOuxW9hjZuc)
+
+- constructing confidence intervals
+- plot CIs using the `segments` function
+
+[Differences in means](https://youtu.be/zR9i8P_cpVc?list=PLo1ryuEXQ0sfGqV7MMwF9SiOuxW9hjZuc)
+
+- given two populations, simulate the null sampling distribution of the difference in means
+- randomly assign individuals to a group using `sample` or some other scheme, then iteratively simulate differences in means with CIs
