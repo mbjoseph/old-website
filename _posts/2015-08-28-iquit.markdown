@@ -6,9 +6,7 @@ comments: true
 categories: R
 ---
 
-For many undergraduates in biology, programming is a [threshold concept](https://books.google.com/books?hl=en&lr=&id=RCUVmm05qmcC&oi=fnd&pg=PP1&ots=SSn68PiCkk&sig=oGSCNE3ALZCleytv4LWN5jYpQII#v=onepage&q&f=false), which can serve as a gateway into other threshold concepts in statistics like sampling and null hypothesis testing.
-So, getting students over the programming hump is a major priority.
-I've uploaded 20+ R tutorials to YouTube for a new undergraduate course in the EBIO department at CU developed by [Andrew Martin](http://stripe.colorado.edu/~am/Site/Martin_Lab.html) and [Brett Melbourne](http://www.colorado.edu/eeb/facultysites/melbourne/), which in jocular anticipation was named IQUIT: an introduction to quantitative inference and thinking.
+I've uploaded 20+ R tutorials to YouTube for a new undergraduate course in Ecology and Evolutionary Biology at CU developed by [Andrew Martin](http://stripe.colorado.edu/~am/Site/Martin_Lab.html) and [Brett Melbourne](http://www.colorado.edu/eeb/facultysites/melbourne/), which in jocular anticipation was named IQUIT: an introduction to quantitative inference and thinking.
 
 We made the videos to address the most common R programming problems that arose for students in the first iteration of the course.
 These short tutorials may be of use elsewhere:
