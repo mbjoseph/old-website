@@ -11,10 +11,3 @@ github_username:  mbjoseph
 # Build settings
 markdown: kramdown
 highlighter: pygments
-
-# analytitcs config
-analytics :
-    provider : google
-    google :
-      tracking_id : 'UA-38672077-1'
-      
