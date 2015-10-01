@@ -29,7 +29,7 @@ Amphibians face many threats worldwide, even in protected wilderness areas and n
 
 - Joseph MB, Preston DL, Johnson PTJ. *accepted*. Integrating occupancy models and structural equation models to understand species occurrence. Ecology.
 
-- Wilkins MR, Shizuka D, Joseph MB, Hubbard JK, Safran RJ. *in press*. Multimodal signaling in the North American barn swallow: a phenotype network approach. Proceedings of the Royal Society B.
+- Wilkins MR, Shizuka D, Joseph MB, Hubbard JK, Safran RJ. 2015. Multimodal signaling in the North American barn swallow: a phenotype network approach. Proceedings of the Royal Society B 282: 20151574. [link](https://www.researchgate.net/publication/282331936_Multimodal_signalling_in_the_North_American_barn_swallow_a_phenotype_network_approach)
 
 - Mihaljevic JR, Joseph MB, Johnson PTJ. 2015. Using multi-species occupancy models to improve the characterization and understanding of metacommunity structure. Ecology 96(7): 1783–1792. [link](http://www.esajournals.org/doi/abs/10.1890/14-1580.1)
 
