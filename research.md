@@ -27,11 +27,11 @@ Amphibians face many threats worldwide, even in protected wilderness areas and n
 
 ### Peer-reviewed publications
 
-- Joseph MB, Preston DL, Johnson PTJ. *accepted*. Integrating occupancy models and structural equation models to understand species occurrence. Ecology.
+- Joseph MB, Preston DL, Johnson PTJ. *in press*. Integrating occupancy models and structural equation models to understand species occurrence. Ecology. [preprint](http://www.colorado.edu/ebio/gradstudents/joseph/pubs/joseph_et_al_2015.pdf)
 
-- Wilkins MR, Shizuka D, Joseph MB, Hubbard JK, Safran RJ. 2015. Multimodal signaling in the North American barn swallow: a phenotype network approach. Proceedings of the Royal Society B 282: 20151574. [link](http://rspb.royalsocietypublishing.org/content/282/1816/20151574)
+- Wilkins MR, Shizuka D, Joseph MB, Hubbard JK, Safran RJ. 2015. Multimodal signaling in the North American barn swallow: a phenotype network approach. Proceedings of the Royal Society B 282: 20151574. [link](http://safranlab.weebly.com/uploads/1/5/2/2/15220084/wilkins_et_al_2015.pdf)
 
-- Mihaljevic JR, Joseph MB, Johnson PTJ. 2015. Using multi-species occupancy models to improve the characterization and understanding of metacommunity structure. Ecology 96(7): 1783–1792. [link](http://www.esajournals.org/doi/abs/10.1890/14-1580.1)
+- Mihaljevic JR, Joseph MB, Johnson PTJ. 2015. Using multi-species occupancy models to improve the characterization and understanding of metacommunity structure. Ecology 96(7): 1783–1792. [link](http://www.colorado.edu/ebio/gradstudents/joseph/pubs/mihaljevic_occupancy.pdf)
 
 - Mihaljevic JR, Joseph MB, Orlofske SA, Paull SH. 2014. The scaling of host density with richness affects the direction, shape, and detectability of diversity-disease relationships. PLoS ONE 9(5): e97812. [link](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0097812)
 
