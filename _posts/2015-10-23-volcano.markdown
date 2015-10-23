@@ -1,0 +1,16 @@
+---
+layout: post
+title: "Maungawhau with a Gaussian process"
+date: 2015-10-23 02:00
+comments: true
+categories: reviews
+---
+
+The Maungawhau volcano dataset is an R classic, often used to illustrate 3d plotting.
+Being on a Gaussian process kick lately, it seemed fun to try to interpolate the volcano elevation data using a subset of the full dataset as training data.
+Even with only 1% of the data, a squared exponential Gaussian process model does a decent job at estimating the true elevation surface ([code here](https://github.com/mbjoseph/qdt-gp/blob/master/R/volcano.R)):
+
+![](/images/volcano.svg)
+
+The upper row of plots show the true elevation surface, estimated surface based on 1% of the data (53 of the 5307 cells), and the squared error in estimation.
+The lower plots show the same data in heatmap form, with the location of sampled points shown as crosses.
