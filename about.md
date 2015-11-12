@@ -11,6 +11,8 @@ Currently, many of my projects focus on developing better statistical models for
 
 ### Papers
 
+- Endohelminths in bird hosts from northern California and an analysis of the role of life history traits on parasite richness. Hannon ER, Kinsella JM, Calhoun DM, **Joseph MB**, Johnson PTJ. *accepted*. The Journal of Parasitology.
+
 - Integrating occupancy models and structural equation models to understand species occurrence.  **Joseph MB**, Preston DL, Johnson PTJ. *in press*. Ecology. [preprint](http://www.colorado.edu/ebio/gradstudents/joseph/pubs/joseph_et_al_2015.pdf)
 
 - Multimodal signaling in the North American barn swallow: a phenotype network approach. Wilkins MR, Shizuka D, **Joseph MB**, Hubbard JK, Safran RJ. 2015. Proceedings of the Royal Society B 282: 20151574. [link](http://safranlab.weebly.com/uploads/1/5/2/2/15220084/wilkins_et_al_2015.pdf)
