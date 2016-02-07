@@ -6,7 +6,7 @@ weight: 2
 ---
 
 I am PhD student at the University of Colorado, Boulder in the Department of Ecology and Evolutionary Biology with Pieter Johnson.
-My work focuses on species interactions, distributions, and traits of free-living and symbiotic organisms.
+I am interested broadly in quantitative tools to better understand and predict species interactions, distributions, and traits of free-living and symbiotic organisms.
 Currently, many of my projects focus on developing better statistical models for species occurrence in space and time.
 
 ### Papers
