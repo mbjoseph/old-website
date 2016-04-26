@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "The five elements ninjas approach to teaching design matrices"
+title: "The five element ninjas approach to teaching design matrices"
 date: 2016-04-25 23:50
 comments: true
 ---
@@ -10,7 +10,7 @@ As part of a hierarchical Bayesian modeling course that we offered this semester
 Naively, I thought that I could spend a few minutes in class reviewing matrix multiplication and a design matrix for simple linear regression, and  if students wanted more, they might end up on [Wikipedia's Design matrix page](https://en.wikipedia.org/wiki/Design_matrix).
 
 It quickly became clear that this approach was not effective, so I started to think about how students could construct their own understanding of design matrices.
-About the same time, I watched a pretty incredible kung fu movie called [Five Elements Ninjas](http://www.imdb.com/title/tt0084921/), and it occurred to me that the "five elements" concept could be an effective device for getting my students to think about model specification and design matrices.
+About the same time, I watched a pretty incredible kung fu movie called [Five Element Ninjas](http://www.imdb.com/title/tt0084921/), and it occurred to me that the "five elements" concept could be an effective device for getting my students to think about model specification and design matrices.
 
 ![](/images/Five-Element-Ninjas-001.jpg)
 
