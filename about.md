@@ -5,15 +5,16 @@ permalink: /about/
 weight: 2
 ---
 
-I am PhD student at the University of Colorado, Boulder in the Department of Ecology and Evolutionary Biology with Pieter Johnson.
-I am interested broadly in quantitative tools to better understand and predict species interactions, distributions, and traits of free-living and symbiotic organisms.
-Currently, many of my projects focus on developing better statistical models for species occurrence in space and time.
+Many of my current projects are centered around increasing the accessibility of high performance computing and large data sets to applied researchers.
+My research background is in disease ecology and hierarchical Bayesian models, and I am currently involved in the development of the Earth Lab Analytics Hub at the University of Colorado, Boulder. 
 
 ### Papers
 
-- Endohelminths in bird hosts from northern California and an analysis of the role of life history traits on parasite richness. Hannon ER, Kinsella JM, Calhoun DM, **Joseph MB**, Johnson PTJ. *accepted*. The Journal of Parasitology.
+- “One Health” or Three? Publication Silos Among the One Health Disciplines. Manlove KR, Walker JG, Craft ME, Huyvaert KP, **Joseph MB**, Miller RS, Nol P, Patyk KA, O’Brien D, Walsh DP, Cross PC. PLoS Biology, 14(4): e1002448. [link](http://journals.plos.org/plosbiology/article?id=10.1371%2Fjournal.pbio.1002448)
 
-- Integrating occupancy models and structural equation models to understand species occurrence.  **Joseph MB**, Preston DL, Johnson PTJ. *in press*. Ecology. [preprint](http://www.colorado.edu/ebio/gradstudents/joseph/pubs/joseph_et_al_2015.pdf)
+- Endohelminths in bird hosts from northern California and an analysis of the role of life history traits on parasite richness. Hannon ER, Kinsella JM, Calhoun DM, **Joseph MB**, Johnson PTJ. The Journal of Parasitology, 102 (2). [link](http://www.journalofparasitology.org/doi/abs/10.1645/15-867)
+
+- Integrating occupancy models and structural equation models to understand species occurrence.  **Joseph MB**, Preston DL, Johnson PTJ. 2016. Ecology, 97 (3). [link](http://onlinelibrary.wiley.com/doi/10.1890/15-0833.1/abstract)
 
 - Multimodal signaling in the North American barn swallow: a phenotype network approach. Wilkins MR, Shizuka D, **Joseph MB**, Hubbard JK, Safran RJ. 2015. Proceedings of the Royal Society B 282: 20151574. [link](http://safranlab.weebly.com/uploads/1/5/2/2/15220084/wilkins_et_al_2015.pdf)
 
