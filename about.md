@@ -6,13 +6,15 @@ weight: 2
 ---
 
 Many of my current projects are centered around increasing the accessibility of high performance computing and large data sets to applied researchers.
-My research background is in disease ecology and hierarchical Bayesian models, and I am currently involved in the development of the Earth Lab Analytics Hub at the University of Colorado, Boulder. 
+My research background is in disease ecology and hierarchical Bayesian models, and I am currently involved in the development of the Earth Lab Analytics Hub at the University of Colorado, Boulder.
 
 ### Papers
 
-- “One Health” or Three? Publication Silos Among the One Health Disciplines. Manlove KR, Walker JG, Craft ME, Huyvaert KP, **Joseph MB**, Miller RS, Nol P, Patyk KA, O’Brien D, Walsh DP, Cross PC. PLoS Biology, 14(4): e1002448. [link](http://journals.plos.org/plosbiology/article?id=10.1371%2Fjournal.pbio.1002448)
+- “One Health” or Three? Publication Silos Among the One Health Disciplines. Manlove KR, Walker JG, Craft ME, Huyvaert KP, **Joseph MB**, Miller RS, Nol P, Patyk KA, O’Brien D, Walsh DP, Cross PC. 2016. PLoS Biology, 14(4): e1002448. [link](http://journals.plos.org/plosbiology/article?id=10.1371%2Fjournal.pbio.1002448)
 
-- Endohelminths in bird hosts from northern California and an analysis of the role of life history traits on parasite richness. Hannon ER, Kinsella JM, Calhoun DM, **Joseph MB**, Johnson PTJ. The Journal of Parasitology, 102 (2). [link](http://www.journalofparasitology.org/doi/abs/10.1645/15-867)
+- Endohelminths in bird hosts from northern California and an analysis of the role of life history traits on parasite richness. Hannon ER, Kinsella JM, Calhoun DM, **Joseph MB**, Johnson PTJ. 2016. The Journal of Parasitology, 102 (2). [link](http://www.journalofparasitology.org/doi/abs/10.1645/15-867)
+
+- Habitat heterogeneity drives the host-diversity-begets-parasite-diversity relationship: evidence from experimental and field studies. Johnson PTJ, Wood CL, **Joseph MB**, Preston DL, Haas SE, Springer YP. Ecology Letters, doi:10.1111/ele.12609. [link](http://onlinelibrary.wiley.com/doi/10.1111/ele.12609)
 
 - Integrating occupancy models and structural equation models to understand species occurrence.  **Joseph MB**, Preston DL, Johnson PTJ. 2016. Ecology, 97 (3). [link](http://onlinelibrary.wiley.com/doi/10.1890/15-0833.1/abstract)
 
