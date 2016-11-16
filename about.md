@@ -10,6 +10,8 @@ My research background is in disease ecology and hierarchical Bayesian models, a
 
 ### Papers
 
+- Multilevel Models for the Distribution of Hosts and Symbionts. **Joseph MB**, Stutz WE, Johnson PTJ. 2016. PLOS ONE 11(11): e0165768. doi: 10.1371/journal.pone.0165768 [link](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0165768)
+
 - “One Health” or Three? Publication Silos Among the One Health Disciplines. Manlove KR, Walker JG, Craft ME, Huyvaert KP, **Joseph MB**, Miller RS, Nol P, Patyk KA, O’Brien D, Walsh DP, Cross PC. 2016. PLoS Biology, 14(4): e1002448. [link](http://journals.plos.org/plosbiology/article?id=10.1371%2Fjournal.pbio.1002448)
 
 - Endohelminths in bird hosts from northern California and an analysis of the role of life history traits on parasite richness. Hannon ER, Kinsella JM, Calhoun DM, **Joseph MB**, Johnson PTJ. 2016. The Journal of Parasitology, 102 (2). [link](http://www.journalofparasitology.org/doi/abs/10.1645/15-867)
