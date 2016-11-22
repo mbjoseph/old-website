@@ -1,0 +1,91 @@
+---
+layout: post
+title: "Global sea ice time series visualization sandbox with R, ggplot, and plotly"
+date: 2016-11-22 6:00
+comments: true
+---
+
+In the past couple of weeks I've noticed a flurry of visualizations of global sea ice extent on social media.
+If you're like me, and curious to see what the data look like yourself, here's a bit of R code to fetch and visualize the most recent data.
+
+{% highlight r%}
+library(dplyr)
+library(ggplot2)
+library(viridis)
+library(plotly)
+
+
+# Define helper functions to get and parse sea ice data from NSIDC --------
+read_nsidc_csv <- function(file) {
+  # reads and loads a csv file of sea ice extent from NSIDC's ftp server
+  hem_code <- substr(file, 1, 2)
+  if (hem_code == "NH") {
+    hemisphere <- "north"
+  } else if (hem_code == "SH") {
+    hemisphere <- "south"
+  } else {
+    stop("Filename is not correctly formatted")
+  }
+  prefix <- paste0("ftp://sidads.colorado.edu/DATASETS/NOAA/G02135/",
+                    hemisphere,
+                   "/daily/data/")
+  file_loc <- paste0(prefix, file)
+  d <- read.csv(file_loc, stringsAsFactors = FALSE)
+  d <- d[-1, ] # this row contains the units
+
+  maybe_as_numeric <- function(x) {
+    numeric_x <- suppressWarnings(as.numeric(x))
+    if (!all(is.na(numeric_x))) x <- numeric_x
+    x
+  }
+
+  # convert numeric columns to numbers and return data.frame
+  lapply(d, maybe_as_numeric) %>%
+    as.data.frame(stringsAsFactors = FALSE)
+}
+
+
+get_seaice_data <- function() {
+  # gets seaice data from northern and southern hemispheres and joins to one df
+  northern_hem <- full_join(read_nsidc_csv("NH_seaice_extent_final_v2.csv"),
+                              read_nsidc_csv("NH_seaice_extent_nrt_v2.csv")) %>%
+    mutate(hem = "Northern hemisphere")
+  southern_hem <- full_join(read_nsidc_csv("SH_seaice_extent_final_v2.csv"),
+                            read_nsidc_csv("SH_seaice_extent_nrt_v2.csv")) %>%
+    mutate(hem = "Southern hemisphere")
+  all_data <- full_join(northern_hem, southern_hem)
+  all_data %>%
+    mutate(date = ISOdate(Year, Month, Day),
+           day_of_year = as.numeric(format(date, "%j")))
+}
+
+
+# load data from NSIDC's ftp server
+seaice <- get_seaice_data()
+
+
+
+# Visualize ---------------------------------------------------------------
+seaice %>%
+  ggplot(aes(x = day_of_year, y = Extent, color = Year, group = Year)) +
+  geom_line() +
+  xlab("Day of year") +
+  ylab("Sea ice extent (million sq km)") +
+  scale_color_viridis(direction = -1) +
+  geom_text(aes(x = day_of_year, y = Extent, label = Year),
+            data = subset(seaice, date == max(date)),
+            nudge_x = c(15, -17)) +
+  ggtitle(paste("Global sea ice extent:",
+                 min(format(seaice$date, "%Y-%m-%d")),
+                 "to",
+                 max(format(seaice$date, "%Y-%m-%d")))) +
+  facet_wrap(~ hem)
+  ggplotly()
+{% endhighlight %}
+
+[Click here to view a larger interactive plot on RPubs](http://rpubs.com/mbjoseph/229198)
+
+<div align="center"><iframe src="//rstudio-pubs-static.s3.amazonaws.com/229198_f6bda0d71e6244e2a47af47c30af439b.html"
+frameborder="0" marginwidth="0" marginheight="0" width="850" height="550" align="right"></iframe></div>
+
+**Disclaimer:** no part of this post is sponsored by the National Snow and Ice Data Center, [which serves the data](http://nsidc.org/data/G02135). This post just shows how to fetch and plot the data.
