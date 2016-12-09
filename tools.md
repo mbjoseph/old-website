@@ -6,7 +6,7 @@ weight: 2
 
 ## [smapr](https://github.com/earthlab/smapr) :droplet:
 
-[![Build Status](https://travis-ci.org/earthlab/smapr.svg?branch=master)](https://travis-ci.org/earthlab/smapr) [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/smapr)](https://cran.r-project.org/package=smapr) [![Licence](https://img.shields.io/badge/licence-GPL--2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html) [![Last-changedate](https://img.shields.io/badge/last%20change-2016--10--07-brightgreen.svg)](/commits/master)
+[![Build Status](https://travis-ci.org/earthlab/smapr.svg?branch=master)](https://travis-ci.org/earthlab/smapr) [![codecov](https://codecov.io/gh/earthlab/smapr/branch/master/graph/badge.svg)](https://codecov.io/gh/earthlab/smapr) [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/smapr)](https://cran.r-project.org/package=smapr) [![Licence](https://img.shields.io/badge/licence-GPL--2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html) [![Last-changedate](https://img.shields.io/badge/last%20change-2016--12--09-brightgreen.svg)](/commits/master)
 
 An R package for acquisition and processing of NASA SMAP soil moisture data 
 
