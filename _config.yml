@@ -11,3 +11,7 @@ github_username:  mbjoseph
 # Build settings
 markdown: kramdown
 highlighter: rouge
+
+gems:
+  - jemoji
+

@@ -1,7 +1,7 @@
 ---
 layout: page
-title: Blog
-weight: 3
+title: Misc
+weight: 4
 ---
 
 {% for post in site.posts %}
