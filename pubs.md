@@ -5,6 +5,12 @@ permalink: /pubs/
 weight: 3
 ---
 
+### Preprints
+
+- Disease and climate effects on individuals jointly drive post-reintroduction population dynamics of an endangered amphibian. Joseph MB, Knapp RA. 2018. bioRxiv 332114; doi: https://doi.org/10.1101/332114 [link](https://www.biorxiv.org/content/early/2018/05/27/332114)
+
+- Understanding and predicting extreme wildfires in the contiguous United States. Joseph MB, Rossi MW, Mietkiewicz NP, Mahood AL, Cattau ME, St. Denis LA, Nagy RC, Iglesias V, Abatzoglou JT, Balch JK. 2018. bioRxiv 384115; doi: https://doi.org/10.1101/384115 [link](https://www.biorxiv.org/content/early/2018/08/03/384115)
+
 ### Peer reviewed
 
 - Multilevel Models for the Distribution of Hosts and Symbionts. **Joseph MB**, Stutz WE, Johnson PTJ. 2016. PLOS ONE 11(11): e0165768. doi: 10.1371/journal.pone.0165768 [link](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0165768)
