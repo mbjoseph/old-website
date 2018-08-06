@@ -41,6 +41,3 @@ weight: 3
 
 - Lack of susceptibility of soil-inhabiting *Platyprepia virginialis* caterpillars, a native arctiid, to entomopathogenic nematodes in nature. Karban R, Hodson A, Gruner DS, Lewis EE, Karban J, **Joseph MB**, Mata T, Strong DR. 2011. Entomologia Experimentalis et Applicata 140 (1): 28-34. [link](http://onlinelibrary.wiley.com/doi/10.1111/j.1570-7458.2011.01133.x/abstract)
 
-### Preprints
-
-- Joseph MB, Stutz WE, Johnson PTJ. 2015. Multilevel models for the distribution of hosts and symbionts. PeerJ PrePrints 3:e1876. [link](https://peerj.com/preprints/1502/)
